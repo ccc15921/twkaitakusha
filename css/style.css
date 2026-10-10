@@ -385,3 +385,38 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
   .official-btn { min-height: 54px; padding: 0 12px; font-size: .95rem; gap: 8px; }
   .stat-value { font-size: 1.05rem; }
 }
+
+/* ---------- voice page (voice.html) ---------- */
+.vlist { grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 18px; align-items: start; }
+.vhead {
+  display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px;
+  background: linear-gradient(180deg, var(--pink-faint), var(--card));
+  border-bottom: 1px dashed var(--line);
+}
+.vhead .project-cover { width: 120px; }
+.vhead h2 { font-size: 1.05rem; }
+.vproject.complete { border-color: var(--pink); }
+.tag.solo { background: var(--pink-deep); color: #fff; }
+.tag.resale { background: transparent; color: var(--accent-text); border: 1px solid var(--pink); }
+.tag.complete { background: var(--pink-bright); color: #fff; }
+.voices { list-style: none; margin: 0; padding: 10px 14px 14px; display: grid; gap: 6px; }
+.voice {
+  display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 12px;
+  border: 1.5px solid var(--line); border-radius: 12px; background: var(--card);
+  transition: border-color .15s, background .15s;
+}
+.voice.owned { border-color: var(--pink); background: var(--pink-faint); }
+.voice-name { flex: 1; min-width: 0; font-size: .9rem; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+.collect-btn {
+  flex: none; padding: 5px 14px; border-radius: 999px; border: 1.5px dashed var(--pink);
+  background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: .8rem;
+  cursor: pointer; white-space: nowrap;
+}
+.collect-btn:hover { background: var(--pink-soft); }
+.collect-btn[aria-pressed="true"] { border-style: solid; background: var(--pink); color: #fff; }
+.collect-btn:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .vhead { grid-template-columns: 80px 1fr; gap: 12px; padding: 12px; }
+  .vhead .project-cover { width: 80px; }
+  .voices { padding: 8px 12px 12px; }
+}
