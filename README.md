@@ -5,11 +5,11 @@
 ## 檔案結構
 
 ```
-index.html      繳稅紀錄簿（周邊）
-voice.html      Voice 收集簿
-css/style.css   兩頁共用樣式（主色 #d11c76 / #f4348b / #FC3488）
-js/app.js       繳稅紀錄簿：讀取 CSV、分組、篩選、繳稅紀錄
-js/voice.js     Voice 收集簿：讀取 AZKi voice 分頁 CSV、分組、篩選、收集紀錄
+index.html           頁面
+css/style.css        樣式（主色 #d11c76 / #f4348b / #FC3488）
+js/app.js            讀取 CSV、分組、篩選、繳稅紀錄
+js/transfer.js       紀錄轉移的編碼／解碼與 QR Code
+js/vendor/qrcode.js  QR Code 產生器（第三方，MIT）
 ```
 
 ## 部署到 GitHub Pages
@@ -44,12 +44,14 @@ CSV 網址在 `js/app.js` 最上面的 `CSV_URL`。
 備份檔格式為 `{"owned": {"企劃代號#編號": 數量}}`，例如 `{"azki_bd2026#3": 2}` 代表買了 2 個。
 舊版備份檔的 `true` 會自動視為 1 個，可以直接匯入。
 
-## Voice 收集簿（voice.html）
+### 轉移到其他裝置（連結 + QR Code）
 
-- 資料來自同一份試算表的 AZKi voice 分頁（CSV 網址在 `js/voice.js` 最上面的 `CSV_URL`）。
-- 欄位：`project code`、`project name`、`date`、`voice name`、`price`、`project website link`、`picture link`。
-- 以 `project code` 分組成一個企劃；企劃名稱、日期、網址、封面取該企劃第一列。
-- 這一頁**不計算金額**，只記錄收集了哪些 Voice。
-- 紀錄鍵是 `企劃代號#Voice 名稱`（忽略空白與全半形括號差異）。**已上線後請不要改既有 Voice 的名稱或企劃代號**，否則勾選紀錄會對不上。
-- 企劃名稱以「AZKi」或「スターティングボイス AZKi」開頭會標成「AZKi 個人」，名稱含「再販」會標成「再販」。
-- 收集紀錄存在 localStorage（`azki-voice-v1`），和繳稅紀錄簿分開，備份檔也分開匯出／匯入。語言與深色模式設定兩頁共用。
+篩選區的「轉移到其他裝置」會把紀錄壓縮後放進網址的 `#t=` 後面並產生 QR Code，另一台裝置掃描或開啟連結，選「合併」或「取代」即可匯入。
+
+- 不需要伺服器或帳號：網址 `#` 後面的內容不會被送到 GitHub，資料只存在連結本身。
+- 連結內含收藏紀錄（企劃代號、編號、數量；不含金額），請只傳給自己。
+- 「合併」同一件周邊取較大的數量，不會刪掉原有紀錄；「取代」則完全覆蓋。
+- 這是一次性的快照，不是自動同步；兩邊都有更動時要再轉移一次。
+- 連結含 CRC32 校驗，被聊天軟體截斷或損壞時會直接拒絕，不會匯入不完整的資料。
+- 格式與編碼在 `js/transfer.js`；QR Code 由 `js/vendor/qrcode.js`（[qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator)，MIT 授權）產生，已放在專案內，不依賴外部 CDN。
+- 實測：約 270 件、含長企劃代號的紀錄，連結約 1200 字元，QR Code 可正常掃描。

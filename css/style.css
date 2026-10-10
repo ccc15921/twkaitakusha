@@ -69,6 +69,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* 避免被 .btn / .link-row 等的 display 蓋掉 */
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
@@ -338,6 +339,29 @@ dialog#lightbox img { max-height: 75vh; margin: 0 auto; object-fit: contain; }
 :root[data-theme="dark"] .official-btn.x { --c: #2a2a2d; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .official-btn.x { --c: #2a2a2d; } }
 
+/* ---------- dialogs (transfer / import) ---------- */
+dialog.dlg {
+  border: 0; border-radius: var(--radius); padding: 22px 20px 20px; width: min(92vw, 440px);
+  background: var(--card); color: var(--ink); box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+}
+dialog.dlg::backdrop { background: rgba(0, 0, 0, .6); }
+dialog.dlg h2 { margin: 0 32px 8px 0; font-size: 1.1rem; color: var(--accent-text); font-family: var(--font-round); }
+dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
+.qr-box { background: #fff; border-radius: 12px; padding: 8px; margin: 14px auto; width: min(100%, 300px); }
+.qr-box svg { display: block; width: 100%; height: auto; }
+.dlg-msg { color: var(--ink-soft); background: var(--pink-faint); border-radius: 10px; padding: 10px 12px; }
+.link-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.link-row input {
+  flex: 1 1 100%; min-width: 0; padding: 8px 10px; border-radius: 10px; font-size: .8rem;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.dlg-warn { color: var(--ink-soft); font-size: .8rem !important; }
+.im-actions { display: grid; gap: 10px; margin-top: 14px; }
+.im-opt { flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 16px; border-radius: 14px; text-align: left; white-space: normal; }
+.im-opt b { font-size: .95rem; }
+.im-opt small { font-size: .78rem; font-weight: 500; opacity: .85; }
+.im-cancel { justify-self: center; }
+
 /* ---------- footer ---------- */
 .site-footer {
   border-top: 1px solid var(--line); background: var(--card); padding: 24px 16px 40px;
@@ -360,39 +384,4 @@ dialog#lightbox img { max-height: 75vh; margin: 0 auto; object-fit: contain; }
   .official-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .official-btn { min-height: 54px; padding: 0 12px; font-size: .95rem; gap: 8px; }
   .stat-value { font-size: 1.05rem; }
-}
-
-/* ---------- voice page (voice.html) ---------- */
-.vlist { grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 18px; align-items: start; }
-.vhead {
-  display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 14px;
-  background: linear-gradient(180deg, var(--pink-faint), var(--card));
-  border-bottom: 1px dashed var(--line);
-}
-.vhead .project-cover { width: 120px; }
-.vhead h2 { font-size: 1.05rem; }
-.vproject.complete { border-color: var(--pink); }
-.tag.solo { background: var(--pink-deep); color: #fff; }
-.tag.resale { background: transparent; color: var(--accent-text); border: 1px solid var(--pink); }
-.tag.complete { background: var(--pink-bright); color: #fff; }
-.voices { list-style: none; margin: 0; padding: 10px 14px 14px; display: grid; gap: 6px; }
-.voice {
-  display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 12px;
-  border: 1.5px solid var(--line); border-radius: 12px; background: var(--card);
-  transition: border-color .15s, background .15s;
-}
-.voice.owned { border-color: var(--pink); background: var(--pink-faint); }
-.voice-name { flex: 1; min-width: 0; font-size: .9rem; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
-.collect-btn {
-  flex: none; padding: 5px 14px; border-radius: 999px; border: 1.5px dashed var(--pink);
-  background: var(--surface); color: var(--accent-text); font-weight: 700; font-size: .8rem;
-  cursor: pointer; white-space: nowrap;
-}
-.collect-btn:hover { background: var(--pink-soft); }
-.collect-btn[aria-pressed="true"] { border-style: solid; background: var(--pink); color: #fff; }
-.collect-btn:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
-@media (max-width: 640px) {
-  .vhead { grid-template-columns: 80px 1fr; gap: 12px; padding: 12px; }
-  .vhead .project-cover { width: 80px; }
-  .voices { padding: 8px 12px 12px; }
 }

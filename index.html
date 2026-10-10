@@ -24,7 +24,6 @@
       <a class="brand" href="./" data-i18n="brand">開拓者の愉悅部</a>
       <ul class="pages">
         <li><a href="./" aria-current="page" data-i18n="nav.ledger">繳稅紀錄簿</a></li>
-        <li><a href="voice.html" data-i18n="nav.voice">Voice 收集簿</a></li>
         <!-- 之後新增頁面放這裡 -->
       </ul>
       <div class="nav-tools">
@@ -100,6 +99,7 @@
       </div>
       <div class="filter-group data-tools">
         <span class="filter-label" data-i18n="filter.record">紀錄</span>
+        <button type="button" class="btn" id="btn-transfer" data-i18n="btn.transfer">轉移到其他裝置</button>
         <button type="button" class="btn ghost" id="btn-export" data-i18n="btn.export">匯出備份</button>
         <label class="btn ghost file-btn"><span data-i18n="btn.import">匯入備份</span><input type="file" id="btn-import" accept="application/json,.json" hidden></label>
       </div>
@@ -157,6 +157,36 @@
     <p class="lb-caption"></p>
   </dialog>
 
+  <dialog id="transfer" class="dlg" aria-labelledby="tr-title">
+    <form method="dialog"><button class="lb-close" aria-label="×">×</button></form>
+    <h2 id="tr-title" data-i18n="tr.title">轉移紀錄</h2>
+    <p data-i18n="tr.desc"></p>
+    <div class="qr-box" id="tr-qr" hidden></div>
+    <p class="dlg-msg" id="tr-msg" hidden></p>
+    <div class="link-row" id="tr-row" hidden>
+      <input type="text" id="tr-link" readonly aria-label="轉移連結">
+      <button type="button" class="btn" id="tr-copy" data-i18n="tr.copy">複製連結</button>
+      <button type="button" class="btn ghost" id="tr-share" data-i18n="tr.share" hidden>分享</button>
+    </div>
+    <p class="dlg-warn" data-i18n="tr.warn"></p>
+  </dialog>
+
+  <dialog id="import-dlg" class="dlg" aria-labelledby="im-title">
+    <h2 id="im-title" data-i18n="im.title">匯入紀錄</h2>
+    <p id="im-summary"></p>
+    <form method="dialog" class="im-actions">
+      <button type="submit" value="merge" class="btn im-opt" autofocus>
+        <b id="im-merge-title"></b><small id="im-merge-desc"></small>
+      </button>
+      <button type="submit" value="replace" class="btn ghost im-opt" id="im-replace">
+        <b data-i18n="im.replace">取代</b><small data-i18n="im.replace.desc"></small>
+      </button>
+      <button type="submit" value="cancel" class="btn ghost small im-cancel" data-i18n="im.cancel">取消</button>
+    </form>
+  </dialog>
+
+  <script src="js/vendor/qrcode.js"></script>
+  <script src="js/transfer.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

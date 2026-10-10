@@ -17,7 +17,7 @@
       'doc.title': '開拓者繳稅紀錄簿｜AZKi 周邊收集清單',
       'doc.desc': '給開拓者們的 AZKi 周邊收集清單。非官方粉絲製作。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿',
+      'nav.ledger': '繳稅紀錄簿',
       title: '開拓者繳稅紀錄簿',
       lead: '把每一筆為 AZKi 繳的稅記下來。點「繳稅」標記已入手的周邊，紀錄只存在你這台裝置的瀏覽器裡。',
       'stat.count': '已繳稅', 'stat.unit': '件', 'stat.yen': '繳稅總額', 'stat.bar': '收集進度',
@@ -40,6 +40,21 @@
       'link.official': '官方頁面', 'link.x': 'X 宣傳', 'link.item': '商品頁',
       pay: '繳稅', paid: '✓ 已繳稅', stamp: '已繳稅',
       'official.title': '官方連結',
+      'btn.transfer': '轉移到其他裝置',
+      'tr.title': '轉移紀錄', 'tr.desc': '在另一台裝置用相機掃描 QR Code，或開啟下方連結，確認後即可匯入。',
+      'tr.warn': '連結內含你的收藏紀錄（沒有金額），只傳給你自己，不要公開張貼。',
+      'tr.copy': '複製連結', 'tr.copied': '已複製', 'tr.share': '分享',
+      'tr.empty': '目前還沒有紀錄可以轉移。', 'tr.noqr': '紀錄太多，QR Code 放不下，請改用連結或匯出備份。',
+      'tr.link': '轉移連結',
+      'im.title': '匯入紀錄',
+      'im.found': (k, n) => `收到 ${k} 種、共 ${n} 個的紀錄。`,
+      'im.local': k => `這台裝置目前已有 ${k} 種紀錄。`,
+      'im.merge': '合併（推薦）', 'im.merge.desc': '同一件周邊取較大的數量，不會刪掉這台裝置原有的紀錄。',
+      'im.replace': '取代', 'im.replace.desc': '用收到的紀錄完全覆蓋這台裝置。',
+      'im.import': '匯入', 'im.import.desc': '把收到的紀錄存到這台裝置。',
+      'im.cancel': '取消',
+      'im.bad': '紀錄無法讀取，連結可能不完整或已損壞。',
+      'im.unsupported': '這個瀏覽器不支援讀取這種連結，請改用匯出備份檔。',
       'amount.show': '點擊顯示金額', 'amount.hide': '點擊隱藏金額',
       'qty.minus': '減少一個', 'qty.plus': '增加一個', 'qty.label': n => `已繳稅 ×${n}`,
       'stat.qty': n => `共 ${n} 個`,
@@ -55,7 +70,7 @@
       'doc.title': '開拓者納税記録簿｜AZKi グッズコレクション',
       'doc.desc': '開拓者のための AZKi グッズ収集リスト。非公式ファンサイトです。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション',
+      'nav.ledger': '納税記録簿',
       title: '開拓者納税記録簿',
       lead: 'AZKi のために納めた税をひとつずつ記録しよう。「納税」を押して入手済みのグッズをチェック。記録はこの端末のブラウザ内にだけ保存されます。',
       'stat.count': '納税済み', 'stat.unit': '点', 'stat.yen': '納税総額', 'stat.bar': '収集の進み具合',
@@ -78,6 +93,21 @@
       'link.official': '公式ページ', 'link.x': 'X の告知', 'link.item': '商品ページ',
       pay: '納税', paid: '✓ 納税済み', stamp: '納税済',
       'official.title': '公式リンク',
+      'btn.transfer': '他の端末に引き継ぐ',
+      'tr.title': '記録を引き継ぐ', 'tr.desc': '別の端末でカメラでQRコードを読み取るか、下のリンクを開いてください。確認後に読み込まれます。',
+      'tr.warn': 'リンクにはコレクションの記録（金額なし）が含まれます。自分だけに送り、公開しないでください。',
+      'tr.copy': 'リンクをコピー', 'tr.copied': 'コピーしました', 'tr.share': '共有',
+      'tr.empty': '引き継ぐ記録がまだありません。', 'tr.noqr': '記録が多くQRコードに収まりません。リンクまたはバックアップをご利用ください。',
+      'tr.link': '引き継ぎリンク',
+      'im.title': '記録の読み込み',
+      'im.found': (k, n) => `${k} 種類・計 ${n} 点の記録を受け取りました。`,
+      'im.local': k => `この端末には現在 ${k} 種類の記録があります。`,
+      'im.merge': '統合（おすすめ）', 'im.merge.desc': '同じグッズは多い方の数を採用し、この端末の記録は消しません。',
+      'im.replace': '置き換え', 'im.replace.desc': '受け取った記録でこの端末の記録を上書きします。',
+      'im.import': '読み込む', 'im.import.desc': '受け取った記録をこの端末に保存します。',
+      'im.cancel': 'キャンセル',
+      'im.bad': '記録を読み込めません。リンクが不完全か壊れている可能性があります。',
+      'im.unsupported': 'このブラウザではこの形式のリンクを開けません。バックアップファイルをご利用ください。',
       'amount.show': 'タップで金額を表示', 'amount.hide': 'タップで金額を非表示',
       'qty.minus': '1つ減らす', 'qty.plus': '1つ増やす', 'qty.label': n => `納税済 ×${n}`,
       'stat.qty': n => `計 ${n} 個`,
@@ -520,6 +550,17 @@
     });
     $('#lightbox').addEventListener('click', e => { if (e.target.id === 'lightbox') e.target.close(); });
 
+    $('#btn-transfer').addEventListener('click', openTransfer);
+    $('#tr-copy').addEventListener('click', copyTransferLink);
+    $('#tr-share').addEventListener('click', () => {
+      const url = $('#tr-link').value;
+      if (url && navigator.share) navigator.share({ title: t('title'), url }).catch(() => {});
+    });
+    $('#tr-link').addEventListener('focus', e => e.target.select());
+    ['#transfer', '#import-dlg'].forEach(sel =>
+      $(sel).addEventListener('click', e => { if (e.target.id === sel.slice(1)) e.target.close(); }));
+    window.addEventListener('hashchange', handleHash);
+
     $('#btn-export').addEventListener('click', () => {
       const data = { app: 'azki-ledger', version: 2, exportedAt: new Date().toISOString(), owned: state.owned };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -536,16 +577,89 @@
         const data = JSON.parse(await file.text());
         const owned = data.owned || data;
         if (typeof owned !== 'object') throw new Error('格式不符');
-        if (!confirm(t('import.confirm'))) return;
-        state.owned = normalizeOwned(owned);
-        saveOwned();
-        render();
+        await importFlow(normalizeOwned(owned));
       } catch (err) {
         alert(t('import.fail'));
       } finally {
         e.target.value = '';
       }
     });
+  }
+
+  /* ---------------- 轉移紀錄（連結 + QR Code）與匯入 ---------------- */
+  const TR = window.AzkiTransfer;
+
+  function ownedStats(o) {
+    let kinds = 0, pieces = 0;
+    Object.keys(o).forEach(k => { kinds++; pieces += o[k]; });
+    return { kinds, pieces };
+  }
+  function mergeOwned(a, b) {
+    const out = Object.assign({}, a);
+    Object.keys(b).forEach(k => { out[k] = Math.max(out[k] || 0, b[k]); });
+    return normalizeOwned(out);
+  }
+  const pageBase = () => location.href.replace(/[#?].*$/, '');
+
+  async function openTransfer() {
+    const dlg = $('#transfer'), box = $('#tr-qr'), msg = $('#tr-msg'), row = $('#tr-row');
+    box.innerHTML = ''; box.hidden = true; msg.hidden = true; row.hidden = true;
+    $('#tr-copy').textContent = t('tr.copy');
+    if (!ownedStats(state.owned).kinds) {
+      msg.textContent = t('tr.empty'); msg.hidden = false;
+    } else {
+      const link = pageBase() + '#t=' + await TR.encode(state.owned);
+      $('#tr-link').value = link;
+      row.hidden = false;
+      $('#tr-share').hidden = !navigator.share;
+      const svg = TR.qrSvg(link);
+      if (svg) { box.innerHTML = svg; box.hidden = false; }
+      else { msg.textContent = t('tr.noqr'); msg.hidden = false; }
+    }
+    if (!dlg.open) dlg.showModal();
+  }
+  async function copyTransferLink() {
+    const input = $('#tr-link'), btn = $('#tr-copy');
+    try { await navigator.clipboard.writeText(input.value); }
+    catch (e) { input.select(); try { document.execCommand('copy'); } catch (e2) { /* ignore */ } }
+    btn.textContent = t('tr.copied');
+    setTimeout(() => { btn.textContent = t('tr.copy'); }, 1500);
+  }
+
+  // 問使用者要合併、取代還是取消；回傳 'merge' | 'replace' | 'cancel'
+  function askImport(incoming) {
+    const dlg = $('#import-dlg');
+    const inc = ownedStats(incoming), loc = ownedStats(state.owned);
+    $('#im-summary').textContent = t('im.found', inc.kinds, inc.pieces) + (loc.kinds ? ' ' + t('im.local', loc.kinds) : '');
+    const empty = loc.kinds === 0;                       // 這台裝置沒有紀錄時，只需要「匯入」一個選項
+    $('#im-merge-title').textContent = t(empty ? 'im.import' : 'im.merge');
+    $('#im-merge-desc').textContent = t(empty ? 'im.import.desc' : 'im.merge.desc');
+    $('#im-replace').hidden = empty;
+    dlg.returnValue = '';
+    return new Promise(resolve => {
+      dlg.addEventListener('close', () => resolve(dlg.returnValue || 'cancel'), { once: true });
+      dlg.showModal();
+    });
+  }
+  async function importFlow(incoming) {
+    if (!ownedStats(incoming).kinds) { alert(t('im.bad')); return; }
+    const choice = await askImport(incoming);
+    if (choice === 'merge') state.owned = mergeOwned(state.owned, incoming);
+    else if (choice === 'replace') state.owned = incoming;
+    else return;
+    saveOwned();
+    if (state.projects.length) render();
+  }
+
+  // 開啟 …/#t=payload 這種轉移連結時，先清掉網址上的 #，再詢問要不要匯入
+  async function handleHash() {
+    const m = /^#t=([A-Za-z0-9_.-]+)/.exec(location.hash);
+    if (!m) return;
+    history.replaceState(null, '', location.pathname + location.search);
+    let incoming;
+    try { incoming = normalizeOwned(await TR.decode(m[1])); }
+    catch (e) { alert(t(e.message === 'unsupported' ? 'im.unsupported' : 'im.bad')); return; }
+    await importFlow(incoming);
   }
 
   /* ---------------- language & theme ---------------- */
@@ -557,6 +671,7 @@
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
     $('#stat-bar').setAttribute('aria-label', t('stat.bar'));
+    $('#tr-link').setAttribute('aria-label', t('tr.link'));
     document.querySelectorAll('.lang-switch button').forEach(b =>
       b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
     updateThemeButton();
@@ -611,6 +726,7 @@
     applyStaticI18n();
     bindEvents();
     load();
+    handleHash();
   }
   if (typeof module !== 'undefined') module.exports = { parseCSV, buildProjects };
 })();
