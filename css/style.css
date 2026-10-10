@@ -163,11 +163,11 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- toolbar ---------- */
 .toolbar { max-width: 1200px; margin: 0 auto; padding: 18px 16px 0; }
 .toolbar-row { display: flex; gap: 8px; }
-#f-q {
+#f-q, .log-search {
   flex: 1; min-width: 0; padding: 10px 14px; border-radius: 12px;
   border: 1.5px solid var(--line); background: var(--surface); outline: none;
 }
-#f-q:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-soft); }
+#f-q:focus, .log-search:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-soft); }
 .filters { display: grid; gap: 10px; margin-top: 12px; }
 .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .filter-label { font-size: .8rem; font-weight: 700; color: var(--ink-soft); min-width: 2.5em; }
@@ -420,3 +420,21 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
   .vhead .project-cover { width: 80px; }
   .voices { padding: 8px 12px 12px; }
 }
+
+.site-footer .updated { margin-top: 12px; font-size: 0.85em; opacity: 0.8; }
+
+/* ---------- log page (log.html) ---------- */
+.logpage { max-width: 860px; margin: 0 auto; padding: 8px 16px 48px; display: grid; gap: 36px; }
+.log-h { font-family: var(--font-round); font-size: 1.25rem; margin: 0 0 12px; color: var(--accent-text); }
+.log-count { font-size: 0.85rem; font-weight: 500; color: var(--ink-soft); }
+.log-sub { margin: 0 0 12px; color: var(--ink-soft); font-size: 0.92rem; }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--pink-soft); display: grid; gap: 14px; }
+.tl-item { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+.tl-item::before { content: ""; position: absolute; left: -26px; top: 18px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+.tl-date { display: block; font-size: 0.8rem; font-weight: 700; color: var(--accent-text); margin-bottom: 4px; }
+.tl-note { overflow-wrap: anywhere; line-height: 1.6; }
+.tl-note a, .todo-list a { color: var(--accent-text); }
+.log-search { width: 100%; box-sizing: border-box; margin-bottom: 12px; color: var(--ink); }
+.todo-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.todo-list li:not(.state) { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; overflow-wrap: anywhere; }
+.timeline .state, .todo-list .state { padding: 20px 0; }

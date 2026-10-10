@@ -17,7 +17,7 @@
       'doc.title': '開拓者繳稅紀錄簿｜AZKi 周邊收集清單',
       'doc.desc': '給開拓者們的 AZKi 周邊收集清單。非官方粉絲製作。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿',
+      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.log': '更新日記',
       title: '開拓者繳稅紀錄簿',
       lead: '把每一筆為 AZKi 繳的稅記下來。點「繳稅」標記已入手的周邊，紀錄只存在你這台裝置的瀏覽器裡。',
       'stat.count': '已繳稅', 'stat.unit': '件', 'stat.yen': '繳稅總額', 'stat.bar': '收集進度',
@@ -30,7 +30,8 @@
       'status.owned': '已繳稅', 'status.missing': '未繳稅',
       'sort.desc': '新 → 舊', 'sort.asc': '舊 → 新',
       'btn.export': '匯出備份', 'btn.import': '匯入備份',
-      'result': (a, b) => `共 ${a} 個企劃・${b} 件周邊`,
+      'result': (a, b) => `目前共收錄 ${a} 個企劃，${b} 件周邊`,
+      'result.match': (a, b) => `符合 ${a} 個企劃、${b} 件周邊`,
       empty: '找不到符合條件的周邊。',
       loading: '稅單讀取中…',
       failed: '稅單讀取失敗，請稍後再試。', retry: '重新讀取',
@@ -63,6 +64,7 @@
       'unit.count': '件',
       'import.confirm': '要用備份檔取代目前的紀錄嗎？', 'import.fail': '匯入失敗：檔案格式不正確。',
       'theme.toLight': '切換為淺色模式', 'theme.toDark': '切換為深色模式',
+      updated: '最後更新',
       footer1: '本站為開拓者自製的非官方粉絲網站，與 COVER 株式会社無關。',
       footer2: '所有商品圖片、名稱與相關著作權皆歸屬於 COVER 株式会社 及各權利人。價格以日圓標示，海外商品依當時匯率換算，僅供參考。',
     },
@@ -70,7 +72,7 @@
       'doc.title': '開拓者納税記録簿｜AZKi グッズコレクション',
       'doc.desc': '開拓者のための AZKi グッズ収集リスト。非公式ファンサイトです。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション',
+      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.log': '更新日記',
       title: '開拓者納税記録簿',
       lead: 'AZKi のために納めた税をひとつずつ記録しよう。「納税」を押して入手済みのグッズをチェック。記録はこの端末のブラウザ内にだけ保存されます。',
       'stat.count': '納税済み', 'stat.unit': '点', 'stat.yen': '納税総額', 'stat.bar': '収集の進み具合',
@@ -83,7 +85,8 @@
       'status.owned': '納税済み', 'status.missing': '未納税',
       'sort.desc': '新しい順', 'sort.asc': '古い順',
       'btn.export': 'バックアップを書き出す', 'btn.import': 'バックアップを読み込む',
-      'result': (a, b) => `${a} 企画・${b} 点`,
+      'result': (a, b) => `現在 ${a} 企画・${b} 点を掲載中`,
+      'result.match': (a, b) => `該当 ${a} 企画・${b} 点`,
       empty: '条件に合うグッズが見つかりません。',
       loading: '納税通知書を読み込み中…',
       failed: '読み込みに失敗しました。しばらくしてからもう一度お試しください。', retry: '再読み込み',
@@ -116,6 +119,7 @@
       'unit.count': '点',
       'import.confirm': '現在の記録をバックアップで置き換えますか？', 'import.fail': '読み込みに失敗しました。ファイル形式が正しくありません。',
       'theme.toLight': 'ライトモードに切り替え', 'theme.toDark': 'ダークモードに切り替え',
+      updated: '最終更新',
       footer1: '本サイトは開拓者による非公式のファンサイトで、カバー株式会社とは一切関係ありません。',
       footer2: '掲載している商品画像・名称およびそれらに関する著作権は、すべてカバー株式会社および各権利者に帰属します。価格は日本円表記で、海外商品は当時のレートで換算した参考価格です。',
     },
@@ -415,7 +419,11 @@
   function render() {
     const list = visibleProjects();
     const itemCount = list.reduce((a, x) => a + x.items.length, 0);
-    $('#result-info').textContent = t('result', list.length, itemCount);
+    const allP = state.projects.filter(p => p.items.length);
+    const allItems = allP.reduce((a, p) => a + p.items.length, 0);
+    let info = t('result', allP.length, allItems);
+    if (list.length !== allP.length || itemCount !== allItems) info += '｜' + t('result.match', list.length, itemCount);
+    $('#result-info').textContent = info;
     $('#list').innerHTML = list.length
       ? list.map(x => projectHTML(x.p, x.items)).join('')
       : `<p class="state">${esc(t('empty'))}</p>`;

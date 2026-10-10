@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>網頁更新日記｜開拓者の愉悅部</title>
+  <meta name="description" content="開拓者の愉悅部的更新紀錄，以及尚未收錄的周邊企劃清單。非官方粉絲製作。">
+  <meta name="theme-color" content="#f4348b">
+  <script>
+    /* 先套用主題，避免閃白（與其他頁面共用設定） */
+    try {
+      var th = localStorage.getItem('azki-ledger-theme');
+      if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topnav" aria-label="Site">
+      <a class="brand" href="./" data-i18n="brand">開拓者の愉悅部</a>
+      <ul class="pages">
+        <li><a href="./" data-i18n="nav.ledger">繳稅紀錄簿</a></li>
+        <li><a href="voice.html" data-i18n="nav.voice">Voice 收集簿</a></li>
+        <li><a href="log.html" aria-current="page" data-i18n="nav.log">更新日記</a></li>
+      </ul>
+      <div class="nav-tools">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh-Hant">繁中</button>
+          <button type="button" data-lang="ja">日本語</button>
+        </div>
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="切換深色模式"></button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <p class="eyebrow">DEVELOPMENT LOG</p>
+      <h1 data-i18n="title">網頁更新日記</h1>
+      <p class="lead" data-i18n="lead"></p>
+    </div>
+  </header>
+
+  <main class="logpage">
+    <section aria-labelledby="notes-title">
+      <h2 class="log-h" id="notes-title" data-i18n="notes.title">更新紀錄</h2>
+      <ol class="timeline" id="notes"><li class="state" data-i18n="loading">讀取中…</li></ol>
+    </section>
+
+    <section aria-labelledby="todo-title">
+      <h2 class="log-h" id="todo-title"><span data-i18n="todo.title">尚未加入的周邊企劃</span> <span class="log-count" id="todo-count"></span></h2>
+      <p class="log-sub" data-i18n="todo.desc"></p>
+      <input type="search" id="todo-q" class="log-search" data-i18n-ph="todo.ph" autocomplete="off">
+      <ul class="todo-list" id="todo"><li class="state" data-i18n="loading">讀取中…</li></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p data-i18n="footer1"></p>
+    <p data-i18n="footer2"></p>
+    <p class="updated"><span data-i18n="updated">最後更新</span>：<time datetime="2026-10-10">2026/10/10</time></p>
+  </footer>
+
+  <script src="js/log.js"></script>
+</body>
+</html>
