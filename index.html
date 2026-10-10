@@ -47,10 +47,11 @@
       <span class="stat-label" data-i18n="stat.count">已繳稅</span>
       <span class="stat-value" id="stat-count">– / –</span>
       <span class="stat-unit" data-i18n="stat.unit">件</span>
+      <span class="stat-unit" id="stat-qty" hidden></span>
     </div>
     <div class="stat">
       <span class="stat-label" data-i18n="stat.yen">繳稅總額</span>
-      <span class="stat-value" id="stat-yen">¥0</span>
+      <button type="button" class="stat-value amount" id="stat-yen" data-amount data-yen="0">¥ ••••</button>
     </div>
     <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="stat-bar">
       <span style="width:0%"></span>
@@ -102,7 +103,13 @@
         <label class="btn ghost file-btn"><span data-i18n="btn.import">匯入備份</span><input type="file" id="btn-import" accept="application/json,.json" hidden></label>
       </div>
     </div>
-    <p class="result-info" id="result-info"></p>
+    <div class="result-row">
+      <p class="result-info" id="result-info"></p>
+      <div class="expand-tools">
+        <button type="button" class="btn ghost small" id="btn-expand-all" data-i18n="expand.all">全部展開</button>
+        <button type="button" class="btn ghost small" id="btn-collapse-all" data-i18n="collapse.all">全部收合</button>
+      </div>
+    </div>
   </section>
 
   <main id="list" class="list">

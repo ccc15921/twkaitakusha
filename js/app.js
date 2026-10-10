@@ -39,8 +39,12 @@
       'zoom.item': n => `放大圖片：${n}`, 'zoom.cover': n => `放大封面：${n}`,
       'link.official': '官方頁面', 'link.x': 'X 宣傳', 'link.item': '商品頁',
       pay: '繳稅', paid: '✓ 已繳稅', stamp: '已繳稅',
-      'all.pay': '全部繳稅', 'all.unpay': '取消全部',
       'official.title': '官方連結',
+      'amount.show': '點擊顯示金額', 'amount.hide': '點擊隱藏金額',
+      'qty.minus': '減少一個', 'qty.plus': '增加一個', 'qty.label': n => `已繳稅 ×${n}`,
+      'stat.qty': n => `共 ${n} 個`,
+      expand: n => `展開周邊（${n}）`, collapse: '收合周邊',
+      'expand.all': '全部展開', 'collapse.all': '全部收合',
       'unit.count': '件',
       'import.confirm': '要用備份檔取代目前的紀錄嗎？', 'import.fail': '匯入失敗：檔案格式不正確。',
       'theme.toLight': '切換為淺色模式', 'theme.toDark': '切換為深色模式',
@@ -73,8 +77,12 @@
       'zoom.item': n => `画像を拡大：${n}`, 'zoom.cover': n => `カバーを拡大：${n}`,
       'link.official': '公式ページ', 'link.x': 'X の告知', 'link.item': '商品ページ',
       pay: '納税', paid: '✓ 納税済み', stamp: '納税済',
-      'all.pay': 'すべて納税', 'all.unpay': 'すべて解除',
       'official.title': '公式リンク',
+      'amount.show': 'タップで金額を表示', 'amount.hide': 'タップで金額を非表示',
+      'qty.minus': '1つ減らす', 'qty.plus': '1つ増やす', 'qty.label': n => `納税済 ×${n}`,
+      'stat.qty': n => `計 ${n} 個`,
+      expand: n => `グッズを見る（${n}）`, collapse: '閉じる',
+      'expand.all': 'すべて開く', 'collapse.all': 'すべて閉じる',
       'unit.count': '点',
       'import.confirm': '現在の記録をバックアップで置き換えますか？', 'import.fail': '読み込みに失敗しました。ファイル形式が正しくありません。',
       'theme.toLight': 'ライトモードに切り替え', 'theme.toDark': 'ダークモードに切り替え',
@@ -183,8 +191,20 @@
   }
 
   /* ---------------- storage ---------------- */
+  const MAX_QTY = 99;
+  // 舊版紀錄是 { key: true }，新版是 { key: 數量 }；兩種都接受
+  function normalizeOwned(obj) {
+    const out = {};
+    if (!obj || typeof obj !== 'object') return out;
+    Object.keys(obj).forEach(k => {
+      const v = obj[k];
+      const n = v === true ? 1 : Math.floor(Number(v));
+      if (Number.isFinite(n) && n >= 1) out[k] = Math.min(n, MAX_QTY);
+    });
+    return out;
+  }
   function loadOwned() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    try { return normalizeOwned(JSON.parse(localStorage.getItem(STORAGE_KEY))); }
     catch (e) { return {}; }
   }
   function saveOwned() {
@@ -209,6 +229,8 @@
   const state = {
     projects: [],
     owned: loadOwned(),
+    expanded: new Set(),
+    showAmt: false,   // 繳稅金額預設隱藏，點擊後才顯示（不跨次保存）
     f: { q: '', ptype: 'all', gtype: 'all', year: 'all', status: 'all', sort: 'desc' },
   };
 
@@ -246,6 +268,15 @@
     return list;
   }
 
+  // 有搜尋／種類／狀態等「周邊層級」的篩選時，自動展開符合的企劃，才看得到結果
+  function itemFilterActive() {
+    const f = state.f;
+    return !!f.q || f.gtype !== 'all' || f.status !== 'all';
+  }
+  function autoExpand() {
+    if (itemFilterActive()) visibleProjects().forEach(x => state.expanded.add(x.p.code));
+  }
+
   /* ---------------- render ---------------- */
   function imgTag(src, alt) {
     if (!src) return `<div class="noimg">${esc(t('img.none'))}</div>`;
@@ -253,35 +284,51 @@
       onerror="this.outerHTML='<div class=&quot;noimg&quot;>${esc(t('img.fail'))}</div>'">`;
   }
 
+  const AMT_MASK = '¥ ••••';
+  function updateAmounts() {
+    const on = state.showAmt;
+    const tip = t(on ? 'amount.hide' : 'amount.show');
+    document.querySelectorAll('[data-amount]').forEach(el => {
+      el.textContent = on ? yen(+el.dataset.yen || 0) : AMT_MASK;
+      el.setAttribute('aria-pressed', String(on));
+      el.title = tip;
+      el.setAttribute('aria-label', tip);
+    });
+  }
+
   function itemHTML(it, p) {
-    const owned = !!state.owned[it.key];
+    const qty = state.owned[it.key] || 0;
+    const owned = qty > 0;
     const link = it.url && it.url !== p.url
       ? `<a class="item-link" href="${esc(it.url)}" target="_blank" rel="noopener">${esc(t('link.item'))}</a>` : '';
     return `
       <article class="item${owned ? ' owned' : ''}" data-key="${esc(it.key)}">
         <button type="button" class="item-img" data-zoom="${esc(it.img)}" data-caption="${esc(it.name)}" aria-label="${esc(t('zoom.item', it.name))}">
           ${imgTag(it.img, it.name)}
-          <span class="stamp">${esc(t('stamp'))}</span>
+          <span class="stamp">${esc(t('stamp'))}${qty > 1 ? ' ×' + qty : ''}</span>
         </button>
         <div class="item-body">
           ${it.type ? `<span><span class="tag">${esc(goodsLabel(it.type))}</span></span>` : ''}
           <p class="item-name" title="${esc(it.name)}">${esc(it.name)}</p>
           ${it.note ? `<p class="item-note">${esc(it.note)}</p>` : ''}
           <div class="item-foot">
-            <span class="price">${it.price != null ? yen(it.price) : '—'}</span>
             ${link}
           </div>
         </div>
-        <button type="button" class="pay-btn" data-toggle="${esc(it.key)}" aria-pressed="${owned}">
-          ${owned ? t('paid') : t('pay')}
-        </button>
+        ${owned ? `
+        <div class="qty" role="group" aria-label="${esc(t('qty.label', qty))}">
+          <button type="button" class="qty-btn" data-step="${esc(it.key)}" data-delta="-1" aria-label="${esc(t('qty.minus'))}">−</button>
+          <span class="qty-label" aria-live="polite">${esc(t('qty.label', qty))}</span>
+          <button type="button" class="qty-btn" data-step="${esc(it.key)}" data-delta="1" aria-label="${esc(t('qty.plus'))}"${qty >= MAX_QTY ? ' disabled' : ''}>+</button>
+        </div>` : `
+        <button type="button" class="pay-btn" data-toggle="${esc(it.key)}">${esc(t('pay'))}</button>`}
       </article>`;
   }
 
   function projectStats(p) {
-    let n = 0, sum = 0;
-    p.items.forEach(it => { if (state.owned[it.key]) { n++; sum += it.price || 0; } });
-    return { n, sum, total: p.items.length };
+    let n = 0;
+    p.items.forEach(it => { if (state.owned[it.key]) n++; });
+    return { n, total: p.items.length };
   }
 
   function projectHTML(p, items) {
@@ -290,9 +337,10 @@
       PROJECT_TYPES[p.type] ? `<span class="tag ${p.type}">${esc(t('ptype.' + p.type))}</span>` : '',
       p.oversea ? `<span class="tag oversea">${esc(t('ptype.oversea'))}</span>` : '',
     ].join('');
-    const allOwned = s.n === s.total;
+    const open = state.expanded.has(p.code);
+    const itemsId = 'items-' + p.code;
     return `
-      <section class="project" data-code="${esc(p.code)}">
+      <section class="project${open ? ' open' : ''}" data-code="${esc(p.code)}">
         <div class="project-head">
           <button type="button" class="project-cover" data-zoom="${esc(p.cover)}" data-caption="${esc(p.name)}" aria-label="${esc(t('zoom.cover', p.name))}">
             ${imgTag(p.cover, p.name)}
@@ -302,25 +350,32 @@
             <h2>${esc(p.name)}</h2>
             ${p.note ? `<p class="project-note">${esc(p.note)}</p>` : ''}
             <div class="project-actions">
-              <span class="project-progress"><b>${s.n}</b> / ${s.total} ${esc(t('unit.count'))}・${yen(s.sum)}</span>
+              <span class="project-progress"><b>${s.n}</b> / ${s.total} ${esc(t('unit.count'))}</span>
               ${p.url ? `<a class="btn ghost" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t('link.official'))}</a>` : ''}
               ${p.xLink ? `<a class="btn ghost" href="${esc(p.xLink)}" target="_blank" rel="noopener">${esc(t('link.x'))}</a>` : ''}
-              <button type="button" class="btn ghost" data-toggle-all="${esc(p.code)}">${allOwned ? t('all.unpay') : t('all.pay')}</button>
+              <button type="button" class="btn expand-btn" data-expand="${esc(p.code)}" aria-expanded="${open}" aria-controls="${esc(itemsId)}">
+                ${esc(open ? t('collapse') : t('expand', items.length))}<span class="chev" aria-hidden="true">▾</span>
+              </button>
             </div>
           </div>
         </div>
-        <div class="items">${items.map(it => itemHTML(it, p)).join('')}</div>
+        ${open ? `<div class="items" id="${esc(itemsId)}">${items.map(it => itemHTML(it, p)).join('')}</div>` : ''}
       </section>`;
   }
 
   function renderSummary() {
-    let total = 0, n = 0, sum = 0;
+    let total = 0, n = 0, sum = 0, pieces = 0;
     state.projects.forEach(p => p.items.forEach(it => {
       total++;
-      if (state.owned[it.key]) { n++; sum += it.price || 0; }
+      const q = state.owned[it.key] || 0;
+      if (q) { n++; pieces += q; sum += (it.price || 0) * q; }
     }));
+    const extra = $('#stat-qty');
+    extra.hidden = pieces <= n;           // 全部都只買一個時不重複顯示
+    extra.textContent = pieces > n ? '（' + t('stat.qty', pieces) + '）' : '';
     $('#stat-count').textContent = `${n} / ${total}`;
-    $('#stat-yen').textContent = yen(sum);
+    $('#stat-yen').dataset.yen = sum;
+    updateAmounts();
     const pct = total ? Math.round(n / total * 100) : 0;
     const bar = $('#stat-bar');
     bar.setAttribute('aria-valuenow', pct);
@@ -345,6 +400,22 @@
     renderSummary();
   }
 
+  // 重新渲染後把鍵盤焦點放回同一件周邊，操作 +/- 時才不會被打斷
+  function focusItem(key, selector) {
+    const card = document.querySelector(`.item[data-key="${CSS.escape(key)}"]`);
+    const el = card && card.querySelector(selector);
+    if (el && !el.disabled) el.focus({ preventScroll: true });
+  }
+
+  function toggleExpand(code, focusBtn) {
+    if (state.expanded.has(code)) state.expanded.delete(code); else state.expanded.add(code);
+    rerenderProject(code);
+    if (focusBtn) {
+      const b = document.querySelector(`[data-expand="${CSS.escape(code)}"]`);
+      if (b) b.focus({ preventScroll: true });
+    }
+  }
+
   function buildFilterOptions() {
     const types = [...new Set(state.projects.flatMap(p => p.items.map(i => i.type)).filter(Boolean))];
     types.sort((a, b) => (GOODS_ORDER.indexOf(a) + 1 || 99) - (GOODS_ORDER.indexOf(b) + 1 || 99));
@@ -364,7 +435,7 @@
     let qTimer;
     $('#f-q').addEventListener('input', e => {
       clearTimeout(qTimer);
-      qTimer = setTimeout(() => { state.f.q = e.target.value.trim().toLowerCase(); render(); }, 150);
+      qTimer = setTimeout(() => { state.f.q = e.target.value.trim().toLowerCase(); autoExpand(); render(); }, 150);
     });
 
     [['#f-ptype', 'ptype'], ['#f-gtype', 'gtype']].forEach(([sel, key]) => {
@@ -373,11 +444,16 @@
         if (!b) return;
         $(sel).querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
         state.f[key] = b.dataset.v;
+        if (key === 'gtype') autoExpand();
         render();
       });
     });
     [['#f-year', 'year'], ['#f-status', 'status'], ['#f-sort', 'sort']].forEach(([sel, key]) => {
-      $(sel).addEventListener('change', e => { state.f[key] = e.target.value; render(); });
+      $(sel).addEventListener('change', e => {
+        state.f[key] = e.target.value;
+        if (key === 'status') autoExpand();
+        render();
+      });
     });
 
     document.querySelectorAll('.lang-switch button').forEach(b =>
@@ -393,22 +469,38 @@
       e.currentTarget.setAttribute('aria-expanded', open);
     });
 
+    $('#btn-expand-all').addEventListener('click', () => {
+      visibleProjects().forEach(x => state.expanded.add(x.p.code));
+      render();
+    });
+    $('#btn-collapse-all').addEventListener('click', () => { state.expanded.clear(); render(); });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('[data-amount]')) return;
+      state.showAmt = !state.showAmt;
+      updateAmounts();
+    });
+
     $('#list').addEventListener('click', e => {
+      const ex = e.target.closest('[data-expand]');
+      if (ex) { toggleExpand(ex.dataset.expand, true); return; }
       const tg = e.target.closest('[data-toggle]');
       if (tg) {
         const key = tg.dataset.toggle;
-        if (state.owned[key]) delete state.owned[key]; else state.owned[key] = true;
+        state.owned[key] = 1;
         saveOwned();
         rerenderProject(key.slice(0, key.lastIndexOf('#')));
+        focusItem(key, '[data-step][data-delta="1"]');
         return;
       }
-      const all = e.target.closest('[data-toggle-all]');
-      if (all) {
-        const p = state.projects.find(x => x.code === all.dataset.toggleAll);
-        const everyOwned = p.items.every(it => state.owned[it.key]);
-        p.items.forEach(it => { if (everyOwned) delete state.owned[it.key]; else state.owned[it.key] = true; });
+      const st = e.target.closest('[data-step]');
+      if (st) {
+        const key = st.dataset.step, delta = +st.dataset.delta;
+        const next = Math.max(0, Math.min(MAX_QTY, (state.owned[key] || 0) + delta));
+        if (next) state.owned[key] = next; else delete state.owned[key];
         saveOwned();
-        rerenderProject(p.code);
+        rerenderProject(key.slice(0, key.lastIndexOf('#')));
+        focusItem(key, next ? `[data-step][data-delta="${delta}"]` : '[data-toggle]');
         return;
       }
       const z = e.target.closest('[data-zoom]');
@@ -418,12 +510,18 @@
         lb.querySelector('img').alt = z.dataset.caption;
         lb.querySelector('.lb-caption').textContent = z.dataset.caption;
         lb.showModal();
+        return;
+      }
+      // 點企劃卡片上的空白處也能展開／收合
+      const head = e.target.closest('.project-head');
+      if (head && !e.target.closest('a, button')) {
+        toggleExpand(head.closest('.project').dataset.code, false);
       }
     });
     $('#lightbox').addEventListener('click', e => { if (e.target.id === 'lightbox') e.target.close(); });
 
     $('#btn-export').addEventListener('click', () => {
-      const data = { app: 'azki-ledger', version: 1, exportedAt: new Date().toISOString(), owned: state.owned };
+      const data = { app: 'azki-ledger', version: 2, exportedAt: new Date().toISOString(), owned: state.owned };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -439,7 +537,7 @@
         const owned = data.owned || data;
         if (typeof owned !== 'object') throw new Error('格式不符');
         if (!confirm(t('import.confirm'))) return;
-        state.owned = owned;
+        state.owned = normalizeOwned(owned);
         saveOwned();
         render();
       } catch (err) {
