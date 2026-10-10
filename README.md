@@ -10,6 +10,7 @@ voice.html           Voice 收集簿
 css/style.css        兩頁共用樣式（主色 #d11c76 / #f4348b / #FC3488）
 js/app.js            繳稅紀錄簿：讀取 CSV、分組、篩選、繳稅紀錄
 js/voice.js          Voice 收集簿：讀取 AZKi voice 分頁 CSV、分組、篩選、收集紀錄
+tools/download_images.py  把 CSV 裡所有縮圖下載備份到 img_backup/
 log.html             網頁更新日記（更新紀錄＋尚未加入的周邊企劃）
 js/log.js            更新日記：讀取兩個 CSV 分頁並顯示
 js/transfer.js       紀錄轉移的編碼／解碼與 QR Code（繳稅紀錄簿用）
@@ -77,3 +78,18 @@ CSV 網址在 `js/app.js` 最上面的 `CSV_URL`。
   - **尚未加入的周邊企劃**（`gid=1081125265`）：欄位 `TODO`（企劃名稱）、`Website`（官方商店網址）。企劃加進繳稅紀錄簿後，把該列從試算表刪掉即可。
 - 這一頁沒有使用者紀錄，只讀取顯示。
 - 頁尾的「最後更新」日期是寫在各 html 檔裡的固定文字，改版時要一起手動更新。
+
+## 縮圖備份（img_backup/）
+
+網頁上的圖片是直接連到來源網站（官方商店等），來源改版或下架時圖會消失，所以可以用腳本把全部縮圖備份下來：
+
+```
+python tools/download_images.py
+```
+
+- 在 `twkaitakusha` 資料夾內執行，只用 Python 內建模組。預設讀取 `js/app.js` 的 `CSV_URL`，也可用 `--csv 檔案` 指定本機 CSV。
+- 檔名為 `企劃代號_編號.副檔名`（編號 0 = 企劃封面），例如 `aziro_commemorativemerch_0.png`。
+- 可重複執行，已下載的會略過；`--retry` 只重試失敗的。結果記錄在 `img_backup/manifest.csv`。
+- 備份只是存檔用，網頁目前仍使用原本的圖片網址。
+- 圖片著作權屬於 COVER 株式会社及各權利人；若 repo 是公開的，上傳備份等於公開轉載，請自行評估（也可以把 `img_backup/` 加進 `.gitignore`，只留在本機）。
+
