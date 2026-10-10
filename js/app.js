@@ -32,6 +32,7 @@
       'btn.export': '匯出備份', 'btn.import': '匯入備份',
       'result': (a, b) => `目前共收錄 ${a} 個企劃，${b} 件周邊`,
       'result.match': (a, b) => `符合 ${a} 個企劃、${b} 件周邊`,
+      'result.yen': '符合範圍的繳稅金額',
       empty: '找不到符合條件的周邊。',
       more: n => `顯示更多（還有 ${n} 個企劃）`,
       loading: '稅單讀取中…',
@@ -88,6 +89,7 @@
       'btn.export': 'バックアップを書き出す', 'btn.import': 'バックアップを読み込む',
       'result': (a, b) => `現在 ${a} 企画・${b} 点を掲載中`,
       'result.match': (a, b) => `該当 ${a} 企画・${b} 点`,
+      'result.yen': '該当分の納税額',
       empty: '条件に合うグッズが見つかりません。',
       more: n => `もっと見る（残り ${n} 企画）`,
       loading: '納税通知書を読み込み中…',
@@ -421,14 +423,23 @@
     bar.firstElementChild.style.width = pct + '%';
   }
 
-  function render() {
-    const list = visibleProjects();
+  function renderResultInfo(list) {
     const itemCount = list.reduce((a, x) => a + x.items.length, 0);
     const allP = state.projects.filter(p => p.items.length);
     const allItems = allP.reduce((a, p) => a + p.items.length, 0);
-    let info = t('result', allP.length, allItems);
-    if (list.length !== allP.length || itemCount !== allItems) info += '｜' + t('result.match', list.length, itemCount);
-    $('#result-info').textContent = info;
+    let html = esc(t('result', allP.length, allItems));
+    if (list.length !== allP.length || itemCount !== allItems) {
+      // 篩選時，另外顯示符合範圍內的繳稅金額（預設隱藏，點擊顯示，和上方總額同步開關）
+      const sub = list.reduce((a, x) => a + x.items.reduce((b, it) => b + (it.price || 0) * (state.owned[it.key] || 0), 0), 0);
+      html += '｜' + esc(t('result.match', list.length, itemCount)) + '｜' + esc(t('result.yen')) +
+        ' <button type="button" class="amount" data-amount data-yen="' + sub + '"></button>';
+    }
+    $('#result-info').innerHTML = html;
+    updateAmounts();
+  }
+  function render() {
+    const list = visibleProjects();
+    renderResultInfo(list);
     state.view = list;
     $('#list').innerHTML = list.length
       ? list.slice(0, state.shown).map(x => projectHTML(x.p, x.items)).join('')
@@ -471,6 +482,7 @@
     const el = document.querySelector(`.project[data-code="${CSS.escape(code)}"]`);
     const entry = visibleProjects().find(x => x.p.code === code);
     if (el && entry) el.outerHTML = projectHTML(entry.p, entry.items);
+    renderResultInfo(visibleProjects());
     renderSummary();
   }
 
