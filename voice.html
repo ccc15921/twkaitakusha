@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AZKi Voice 收集簿｜開拓者の愉悅部</title>
+  <meta name="description" content="整理 AZKi 參與的官方ボイス商品，記錄自己收集了哪些。非官方粉絲製作。">
+  <meta name="theme-color" content="#f4348b">
+  <script>
+    /* 先套用主題，避免閃白（與繳稅紀錄簿共用設定） */
+    try {
+      var th = localStorage.getItem('azki-ledger-theme');
+      if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topnav" aria-label="Site">
+      <a class="brand" href="./" data-i18n="brand">開拓者の愉悅部</a>
+      <ul class="pages">
+        <li><a href="./" data-i18n="nav.ledger">繳稅紀錄簿</a></li>
+        <li><a href="voice.html" aria-current="page" data-i18n="nav.voice">Voice 收集簿</a></li>
+      </ul>
+      <div class="nav-tools">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh-Hant">繁中</button>
+          <button type="button" data-lang="ja">日本語</button>
+        </div>
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="切換深色模式"></button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <p class="eyebrow">AZKi VOICE COLLECTION</p>
+      <h1 data-i18n="title">AZKi Voice 收集簿</h1>
+      <p class="lead" data-i18n="lead"></p>
+    </div>
+  </header>
+
+  <section class="summary" id="summary" aria-live="polite">
+    <div class="stat">
+      <span class="stat-label" data-i18n="stat.count">已收集</span>
+      <span class="stat-value" id="stat-count">– / –</span>
+      <span class="stat-unit" data-i18n="stat.unit">件</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label" data-i18n="stat.complete">全收集企劃</span>
+      <span class="stat-value" id="stat-complete">– / –</span>
+    </div>
+    <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="stat-bar">
+      <span style="width:0%"></span>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="toolbar-row">
+      <input type="search" id="f-q" data-i18n-ph="search.ph" autocomplete="off">
+      <button type="button" class="btn ghost toggle-filters" id="toggle-filters" aria-expanded="false" aria-controls="filters" data-i18n="filter.toggle">篩選</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <div class="filter-group">
+        <span class="filter-label" data-i18n="filter.kind">企劃</span>
+        <div class="chips" id="f-kind">
+          <button type="button" data-v="all" class="on" data-i18n="chip.all">全部</button>
+          <button type="button" data-v="solo" data-i18n="kind.solo">AZKi 個人</button>
+          <button type="button" data-v="group" data-i18n="kind.group">多人企劃</button>
+          <button type="button" data-v="resale" data-i18n="kind.resale">再販</button>
+        </div>
+      </div>
+      <div class="filter-group selects">
+        <label><span data-i18n="filter.year">年份</span>
+          <select id="f-year"><option value="all">全部</option></select>
+        </label>
+        <label><span data-i18n="filter.status">狀態</span>
+          <select id="f-status">
+            <option value="all" data-i18n="chip.all">全部</option>
+            <option value="owned" data-i18n="status.owned">已收集</option>
+            <option value="missing" data-i18n="status.missing">未收集</option>
+          </select>
+        </label>
+        <label><span data-i18n="filter.sort">排序</span>
+          <select id="f-sort">
+            <option value="desc" data-i18n="sort.desc">新 → 舊</option>
+            <option value="asc" data-i18n="sort.asc">舊 → 新</option>
+          </select>
+        </label>
+      </div>
+      <div class="filter-group data-tools">
+        <span class="filter-label" data-i18n="filter.record">紀錄</span>
+        <button type="button" class="btn ghost" id="btn-export" data-i18n="btn.export">匯出備份</button>
+        <label class="btn ghost file-btn"><span data-i18n="btn.import">匯入備份</span><input type="file" id="btn-import" accept="application/json,.json" hidden></label>
+      </div>
+    </div>
+    <div class="result-row">
+      <p class="result-info" id="result-info"></p>
+    </div>
+  </section>
+
+  <main id="list" class="list vlist">
+    <p class="state" data-i18n="loading">Voice 清單讀取中…</p>
+  </main>
+
+  <section class="official" aria-labelledby="official-title">
+    <h2 id="official-title" data-i18n="official.title">官方連結</h2>
+    <ul class="official-grid">
+      <li>
+        <a class="official-btn yt" href="https://www.youtube.com/@AZKi" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <span>AZKi Channel</span>
+        </a>
+      </li>
+      <li>
+        <a class="official-btn x" href="https://x.com/AZKi_VDiVA" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+          <span>AZKi_VDiVA</span>
+        </a>
+      </li>
+      <li>
+        <a class="official-btn tt" href="https://www.tiktok.com/@azki_hololive" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+          <span>azki_hololive</span>
+        </a>
+      </li>
+      <li>
+        <a class="official-btn holo" href="https://hololive.hololivepro.com/talents/azki/" target="_blank" rel="noopener">
+          <span>ホロライブ公式</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <footer class="site-footer">
+    <p data-i18n="footer1"></p>
+    <p data-i18n="footer2"></p>
+  </footer>
+
+  <dialog id="lightbox" aria-label="Image">
+    <form method="dialog"><button class="lb-close" aria-label="×">×</button></form>
+    <img alt="" referrerpolicy="no-referrer">
+    <p class="lb-caption"></p>
+  </dialog>
+
+  <script src="js/voice.js"></script>
+</body>
+</html>
