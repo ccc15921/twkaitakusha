@@ -65,6 +65,12 @@
       <input type="search" id="f-q" data-i18n-ph="search.ph" autocomplete="off">
       <button type="button" class="btn ghost toggle-filters" id="toggle-filters" aria-expanded="false" aria-controls="filters" data-i18n="filter.toggle">篩選</button>
     </div>
+    <div class="filter-group data-tools">
+      <span class="filter-label" data-i18n="filter.record">紀錄</span>
+      <button type="button" class="btn" id="btn-transfer" data-i18n="btn.transfer">轉移到其他裝置</button>
+      <button type="button" class="btn ghost" id="btn-export" data-i18n="btn.export">匯出備份</button>
+      <label class="btn ghost file-btn"><span data-i18n="btn.import">匯入備份</span><input type="file" id="btn-import" accept="application/json,.json" hidden></label>
+    </div>
 
     <div class="filters" id="filters">
       <div class="filter-group">
@@ -98,12 +104,6 @@
             <option value="asc" data-i18n="sort.asc">舊 → 新</option>
           </select>
         </label>
-      </div>
-      <div class="filter-group data-tools">
-        <span class="filter-label" data-i18n="filter.record">紀錄</span>
-        <button type="button" class="btn" id="btn-transfer" data-i18n="btn.transfer">轉移到其他裝置</button>
-        <button type="button" class="btn ghost" id="btn-export" data-i18n="btn.export">匯出備份</button>
-        <label class="btn ghost file-btn"><span data-i18n="btn.import">匯入備份</span><input type="file" id="btn-import" accept="application/json,.json" hidden></label>
       </div>
     </div>
     <div class="result-row">

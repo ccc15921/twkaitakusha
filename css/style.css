@@ -163,6 +163,7 @@ button, input, select { font: inherit; color: inherit; }
 /* ---------- toolbar ---------- */
 .toolbar { max-width: 1200px; margin: 0 auto; padding: 18px 16px 0; }
 .toolbar-row { display: flex; gap: 8px; }
+.data-tools { margin-top: 10px; }
 #f-q, .log-search {
   flex: 1; min-width: 0; padding: 10px 14px; border-radius: 12px;
   border: 1.5px solid var(--line); background: var(--surface); outline: none;
@@ -376,6 +377,8 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
   .toggle-filters { display: inline-flex; }
   .filters { display: none; }
   .filters.open { display: grid; }
+  .data-tools .btn { flex: 1 1 0; min-width: 0; padding-left: 6px; padding-right: 6px; font-size: .85rem; white-space: nowrap; justify-content: center; text-align: center; }
+  .data-tools .file-btn { display: inline-flex; align-items: center; }
   .project-head { grid-template-columns: 88px 1fr; gap: 12px; padding: 12px; }
   .project-cover { width: 88px; }
   .project h2 { font-size: 1rem; }
