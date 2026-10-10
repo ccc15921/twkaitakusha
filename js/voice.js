@@ -29,6 +29,7 @@
       'btn.export': '匯出備份', 'btn.import': '匯入備份',
       result: (a, b) => `共 ${a} 個企劃・${b} 件 Voice`,
       empty: '找不到符合條件的 Voice。',
+      more: n => `顯示更多（還有 ${n} 個企劃）`,
       loading: 'Voice 清單讀取中…',
       failed: 'Voice 清單讀取失敗，請稍後再試。', retry: '重新讀取',
       'date.tbd': '日期未定',
@@ -64,6 +65,7 @@
       'btn.export': 'バックアップを書き出す', 'btn.import': 'バックアップを読み込む',
       result: (a, b) => `${a} 企画・${b} 点`,
       empty: '条件に合うボイスが見つかりません。',
+      more: n => `もっと見る（残り ${n} 企画）`,
       loading: 'ボイス一覧を読み込み中…',
       failed: '読み込みに失敗しました。しばらくしてからもう一度お試しください。', retry: '再読み込み',
       'date.tbd': '日付未定',
@@ -185,7 +187,10 @@
     : (p.dateText || t('date.tbd'));
 
   /* ---------------- state ---------------- */
+  const PAGE_SIZE = 10;
   const state = {
+    shown: PAGE_SIZE,   // 目前顯示幾個企劃
+    view: [],           // 目前篩選後的企劃清單
     projects: [],
     owned: loadOwned(),
     f: { q: '', kind: 'all', year: 'all', status: 'all', sort: 'desc' },
@@ -296,10 +301,41 @@
     const list = visibleProjects();
     const itemCount = list.reduce((a, x) => a + x.items.length, 0);
     $('#result-info').textContent = t('result', list.length, itemCount);
+    state.view = list;
     $('#list').innerHTML = list.length
-      ? list.map(x => projectHTML(x.p, x.items)).join('')
+      ? list.slice(0, state.shown).map(x => projectHTML(x.p, x.items)).join('')
       : `<p class="state">${esc(t('empty'))}</p>`;
+    updateMore();
     renderSummary();
+  }
+
+  /* ---------------- 分批顯示（一次 PAGE_SIZE 個企劃，往下捲或按「更多」繼續） ---------------- */
+  function updateMore() {
+    const wrap = $('#more-wrap');
+    if (!wrap) return;
+    const rest = state.view.length - state.shown;
+    wrap.hidden = rest <= 0;
+    if (rest > 0) $('#btn-more').textContent = t('more', rest);
+  }
+  function loadMore() {
+    const from = state.shown;
+    if (from >= state.view.length) return;
+    state.shown = from + PAGE_SIZE;
+    $('#list').insertAdjacentHTML('beforeend',
+      state.view.slice(from, state.shown).map(x => projectHTML(x.p, x.items)).join(''));
+    updateMore();
+  }
+  function bindMore() {
+    const wrap = $('#more-wrap');
+    $('#btn-more').addEventListener('click', loadMore);
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !wrap.hidden) {
+        loadMore();
+        io.unobserve(wrap); io.observe(wrap);   // 重新觀察：還看得到按鈕時會繼續載入
+      }
+    }, { rootMargin: '400px 0px' });
+    io.observe(wrap);
   }
 
   function rerenderProject(code) {
@@ -324,10 +360,11 @@
 
   /* ---------------- events ---------------- */
   function bindEvents() {
+    bindMore();
     let qTimer;
     $('#f-q').addEventListener('input', e => {
       clearTimeout(qTimer);
-      qTimer = setTimeout(() => { state.f.q = e.target.value.trim().toLowerCase(); render(); }, 150);
+      qTimer = setTimeout(() => { state.f.q = e.target.value.trim().toLowerCase(); state.shown = PAGE_SIZE; render(); }, 150);
     });
 
     $('#f-kind').addEventListener('click', e => {
@@ -335,10 +372,11 @@
       if (!b) return;
       $('#f-kind').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
       state.f.kind = b.dataset.v;
+      state.shown = PAGE_SIZE;
       render();
     });
     [['#f-year', 'year'], ['#f-status', 'status'], ['#f-sort', 'sort']].forEach(([sel, key]) => {
-      $(sel).addEventListener('change', e => { state.f[key] = e.target.value; render(); });
+      $(sel).addEventListener('change', e => { state.f[key] = e.target.value; state.shown = PAGE_SIZE; render(); });
     });
 
     document.querySelectorAll('.lang-switch button').forEach(b =>

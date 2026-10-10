@@ -441,3 +441,16 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
 .todo-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .todo-list li:not(.state) { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; overflow-wrap: anywhere; }
 .timeline .state, .todo-list .state { padding: 20px 0; }
+
+/* ---------- 更多 / 回到最上面 ---------- */
+.more-wrap { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; text-align: center; }
+.more-wrap[hidden] { display: none; }
+.more-wrap .btn { min-width: 220px; padding: 12px 24px; }
+.to-top {
+  position: fixed; right: 16px; bottom: 20px; z-index: 20;
+  width: 48px; height: 48px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--pink-bright); color: #fff; font-size: 1.4rem; line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+}
+.to-top:hover { background: var(--pink-deep); }
+.to-top:focus-visible { outline: 3px solid var(--pink-soft); outline-offset: 2px; }
