@@ -1,0 +1,27 @@
+# 每 3 天呼叫一次 Supabase，避免免費專案閒置一週被自動暫停。
+# 也可以在 GitHub 的 Actions 分頁手動執行（Run workflow）。
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: '17 3 */3 * *'   # UTC 03:17（台灣 11:17），每 3 天
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call keepalive()
+        env:
+          # 與 js/cloud.js 相同的公開金鑰（publishable key，本來就公開在網頁裡）
+          SUPABASE_URL: https://xellkwnyidvuhmegnypt.supabase.co
+          SUPABASE_KEY: sb_publishable_yCDkwCKRmQwFL7jGgdeXQw_Jy4kk3kt
+        run: |
+          code=$(curl -sS -o resp.txt -w '%{http_code}' -X POST \
+            "$SUPABASE_URL/rest/v1/rpc/keepalive" \
+            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" -d '{}')
+          echo "HTTP $code: $(cat resp.txt)"
+          test "$code" = "200"

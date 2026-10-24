@@ -526,3 +526,9 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
   .login-btn span { display: none; }
   .login-btn { padding: 6px 10px; }
 }
+.auth-del { justify-self: center; background: none; border: 0; padding: 2px; cursor: pointer; font: inherit; font-size: .75rem; color: var(--ink-soft); text-decoration: underline; }
+.auth-del:hover { color: #d33; }
+.del-check { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: .9rem; }
+.del-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.btn-danger { background: #d33 !important; border-color: #d33 !important; color: #fff !important; }
+.btn-danger:disabled { opacity: .45; cursor: not-allowed; }

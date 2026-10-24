@@ -33,7 +33,11 @@
       'cf.merge': '合併', 'cf.merge.desc': '兩邊的紀錄都保留，同一件取較大的數量',
       'cf.cloud': '以雲端為準', 'cf.cloud.desc': '用雲端的紀錄取代這台裝置的紀錄',
       'menu.label': '帳號選單', 'login.failed': '登入失敗，請再試一次。',
-      'logout.note': '登出後，紀錄仍會保留在這台裝置。'
+      'logout.note': '登出後，紀錄仍會保留在這台裝置。',
+      'del.link': '刪除帳號', 'del.title': '刪除帳號',
+      'del.desc': '會永久刪除雲端上的所有紀錄（繳稅紀錄簿、Voice 收集簿）、個人設定與帳號，無法復原。這台裝置瀏覽器裡的紀錄會保留。',
+      'del.check': '我了解刪除後無法復原', 'del.ok': '永久刪除', 'del.cancel': '取消',
+      'del.done': '帳號已刪除。這台裝置的紀錄仍然保留。', 'del.failed': '刪除失敗，請稍後再試。'
     },
     ja: {
       login: 'Google でログイン', logout: 'ログアウト', syncNow: '今すぐ同期',
@@ -46,7 +50,11 @@
       'cf.merge': '統合する', 'cf.merge.desc': '両方の記録を残し、同じ項目は多い方の数量にします',
       'cf.cloud': 'クラウドを優先', 'cf.cloud.desc': 'この端末の記録をクラウドの記録で置き換えます',
       'menu.label': 'アカウントメニュー', 'login.failed': 'ログインに失敗しました。もう一度お試しください。',
-      'logout.note': 'ログアウト後も、記録はこの端末に残ります。'
+      'logout.note': 'ログアウト後も、記録はこの端末に残ります。',
+      'del.link': 'アカウントを削除', 'del.title': 'アカウントを削除',
+      'del.desc': 'クラウド上のすべての記録（納税記録簿・ボイスコレクション）、個人設定、アカウントを完全に削除します。元に戻せません。この端末のブラウザ内の記録は残ります。',
+      'del.check': '削除すると元に戻せないことを理解しました', 'del.ok': '完全に削除する', 'del.cancel': 'キャンセル',
+      'del.done': 'アカウントを削除しました。この端末の記録はそのまま残っています。', 'del.failed': '削除に失敗しました。しばらくしてからお試しください。'
     }
   };
   const lang = () => {
@@ -285,6 +293,7 @@
         ${Object.keys(books).length ? `<button type="button" class="btn ghost small" data-act="sync">${esc(t('syncNow'))}</button>` : ''}
         <button type="button" class="btn small" data-act="logout">${esc(t('logout'))}</button>
         <p class="auth-note">${esc(t('logout.note'))}</p>
+        <button type="button" class="auth-del" data-act="delete">${esc(t('del.link'))}</button>
       </div>`;
     const img = box.querySelector('.avatar-btn img');
     if (img) img.addEventListener('error', () => { img.replaceWith(Object.assign(document.createElement('span'), { textContent: (name || '?').slice(0, 1).toUpperCase() })); });
@@ -295,6 +304,43 @@
     const { error } = await client.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: back } });
     if (error) alert(t('login.failed'));
   }
+  function confirmDelete() {
+    return new Promise(resolve => {
+      const dlg = document.createElement('dialog');
+      dlg.className = 'dlg';
+      dlg.innerHTML = `<form method="dialog"><button class="lb-close" value="cancel" aria-label="×">×</button></form>
+        <h2>${esc(t('del.title'))}</h2><p>${esc(t('del.desc'))}</p>
+        <label class="del-check"><input type="checkbox"> ${esc(t('del.check'))}</label>
+        <form method="dialog" class="del-actions">
+          <button type="submit" value="cancel" class="btn ghost">${esc(t('del.cancel'))}</button>
+          <button type="submit" value="ok" class="btn btn-danger" disabled>${esc(t('del.ok'))}</button>
+        </form>`;
+      const cb = dlg.querySelector('input[type=checkbox]'), ok = dlg.querySelector('button[value=ok]');
+      cb.addEventListener('change', () => { ok.disabled = !cb.checked; });
+      dlg.addEventListener('close', () => { resolve(dlg.returnValue === 'ok' && cb.checked); dlg.remove(); });
+      document.body.appendChild(dlg);
+      dlg.showModal();
+    });
+  }
+  async function deleteAccount() {
+    if (!(await confirmDelete())) return;
+    const { error } = await client.rpc('delete_my_account');
+    if (error) { console.warn('[cloud] delete failed', error); alert(t('del.failed')); return; }
+    store.del(PENDING_KEY);
+    pending = { user: null, books: {} };
+    try { await client.auth.signOut({ scope: 'local' }); } catch (e) { /* 帳號已不存在，忽略 */ }
+    clearLocalAuth();
+    alert(t('del.done'));
+  }
+  function clearLocalAuth() {
+    ['ledger', 'voice'].forEach(b => store.del(linkKey(b)));
+    store.del(OLD_LINK_KEY);
+    store.del(PENDING_KEY);
+    pending = { user: null, books: {} };
+    startedFor = null; ready = false; user = null;
+    setStatus('idle');
+  }
+
   async function signOut() {
     try { if (pendingCount()) await push(); } catch (e) { /* ignore */ }
     await client.auth.signOut();
@@ -318,6 +364,7 @@
       const act = b.dataset.act;
       if (act === 'login') signIn();
       else if (act === 'logout') signOut();
+      else if (act === 'delete') deleteAccount();
       else if (act === 'sync') refresh();
       else if (act === 'menu') {
         const m = box.querySelector('.auth-menu');

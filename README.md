@@ -19,7 +19,8 @@ js/log.js            更新日記：讀取兩個 CSV 分頁並顯示
 js/transfer.js       紀錄轉移的編碼／解碼與 QR Code（繳稅紀錄簿用）
 js/cloud.js          Google 登入與雲端同步（Supabase）
 js/vendor/supabase.js  supabase-js 2.117.2（第三方，MIT）
-supabase/            資料庫建置 SQL（在 Supabase 後台 SQL Editor 執行）
+supabase/            資料庫建置 SQL（在 Supabase 後台 SQL Editor 依編號執行）
+.github/workflows/    GitHub Actions（Supabase 保持活躍）
 js/vendor/qrcode.js  QR Code 產生器（第三方，MIT）
 ```
 
@@ -117,5 +118,6 @@ python tools/download_images.py
 - 資料庫：在 Supabase 後台 **SQL Editor** 執行 `supabase/001_init.sql`（可重複執行）。建立 `records`（紀錄）、`profiles`（個人資料，先預留給排行榜）與權限規則（每個人只能讀寫自己的紀錄）。
 - 同步規則：本機修改先記成「待同步」約 1 秒後送出；雲端為正本。這台裝置第一次和帳號連結時，兩邊都有不同紀錄會讓使用者選「合併（同一件取較大數量）」或「以雲端為準」。登出保留本機紀錄，下次登入重新比較。
 - 繳稅紀錄簿（`book=ledger`）與 Voice 收集簿（`book=voice`，收集＝數量 1）都會同步；更新日記頁只顯示登入狀態。每本紀錄各自記錄「這台裝置是否已和帳號連結」，第一次在某頁登入時才比較那一本。
+- 刪除帳號：頭像選單最下方「刪除帳號」，勾選確認後呼叫資料庫函式 `delete_my_account()`，連同所有雲端紀錄與個人資料一起刪除（本機紀錄保留）。需先執行 `supabase/002_account_keepalive.sql`。
+- 保持活躍：`.github/workflows/keepalive.yml` 每 3 天呼叫 `keepalive()`，避免免費專案閒置一週被暫停；可在 GitHub 的 Actions 分頁手動執行測試。注意 GitHub 會在 repo 連續 60 天沒有任何活動時自動停用排程，屆時到 Actions 分頁重新啟用即可。
 - 詳細規劃見 Project 文件「會員系統規劃（Supabase）」。
-
