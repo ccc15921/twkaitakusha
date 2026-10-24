@@ -162,6 +162,7 @@
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* ignore */ }
     applyStaticI18n();
     if (state.loaded) render();
+    if (window.AzkiCloud) window.AzkiCloud.refreshLang();
   }
   function isDark() {
     const a = document.documentElement.getAttribute('data-theme');
@@ -224,5 +225,6 @@
       qTimer = setTimeout(() => { state.q = e.target.value; if (state.loaded) renderTodo(); }, 120);
     });
     load();
+    if (window.AzkiCloud) window.AzkiCloud.init({ books: {} });   // 只顯示登入狀態（也會補送其他頁面未送出的紀錄）
   }
 })();

@@ -17,7 +17,7 @@
       brand: '開拓者の愉悅部',
       'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.log': '更新日記',
       title: 'AZKi Voice 收集簿',
-      lead: '整理 AZKi 參與的官方ボイス商品。點「收集」標記已入手的 Voice，紀錄只存在你這台裝置的瀏覽器裡。',
+      lead: '整理 AZKi 參與的官方ボイス商品。點「收集」標記已入手的 Voice，紀錄會存在你這台裝置的瀏覽器裡；用 Google 登入後，還能同步到其他裝置。',
       'stat.count': '已收集', 'stat.unit': '件', 'stat.complete': '全收集企劃', 'stat.bar': '收集進度',
       'search.ph': '搜尋企劃或 Voice 名稱…',
       'filter.toggle': '篩選', 'filter.kind': '企劃', 'filter.year': '年份',
@@ -53,7 +53,7 @@
       brand: '開拓者の愉悅部',
       'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.log': '更新日記',
       title: 'AZKi ボイスコレクション',
-      lead: 'AZKi が参加した公式ボイス商品の一覧です。「収集」を押して入手済みのボイスをチェック。記録はこの端末のブラウザ内にだけ保存されます。',
+      lead: 'AZKi が参加した公式ボイス商品の一覧です。「収集」を押して入手済みのボイスをチェック。記録はこの端末のブラウザに保存され、Google でログインすると他の端末とも同期できます。',
       'stat.count': '収集済み', 'stat.unit': '点', 'stat.complete': 'コンプ企画', 'stat.bar': '収集の進み具合',
       'search.ph': '企画名・ボイス名で検索…',
       'filter.toggle': '絞り込み', 'filter.kind': '企画', 'filter.year': '年',
@@ -176,6 +176,13 @@
   }
   function saveOwned() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.owned)); } catch (e) { /* ignore */ }
+    if (window.AzkiCloud) window.AzkiCloud.localChanged('voice', toQty(state.owned));   // 登入時同步到雲端
+  }
+  // 雲端用數量記錄（收集＝1），這一頁用 true／不存在
+  function toQty(owned) {
+    const out = {};
+    Object.keys(owned).forEach(k => { if (owned[k]) out[k] = 1; });
+    return out;
   }
 
   /* ---------------- helpers ---------------- */
@@ -471,6 +478,7 @@
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* ignore */ }
     applyStaticI18n();
     if (state.projects.length) { buildFilterOptions(); render(); }
+    if (window.AzkiCloud) window.AzkiCloud.refreshLang();
   }
 
   function isDark() {
@@ -515,6 +523,21 @@
     applyStaticI18n();
     bindEvents();
     load();
+    // 雲端同步：雲端有更新時直接套用到畫面（不經過 saveOwned，避免又被當成本機修改送回去）
+    if (window.AzkiCloud) {
+      window.AzkiCloud.init({
+        books: {
+          voice: {
+            get: () => toQty(state.owned),
+            apply: owned => {
+              state.owned = normalizeOwned(owned);
+              try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.owned)); } catch (e) { /* ignore */ }
+              if (state.projects.length) render(); else renderSummary();
+            }
+          }
+        }
+      });
+    }
   }
   if (typeof module !== 'undefined') module.exports = { parseCSV, buildProjects, normName };
 })();

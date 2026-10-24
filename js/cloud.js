@@ -14,7 +14,8 @@
 
   const SUPABASE_URL = 'https://xellkwnyidvuhmegnypt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_yCDkwCKRmQwFL7jGgdeXQw_Jy4kk3kt';   // 公開金鑰（可以公開）
-  const LINK_KEY = 'azki-cloud-user';          // 這台裝置目前連結的帳號 id
+  const LINK_KEY = 'azki-cloud-user:';         // + book：這台裝置的這本紀錄目前連結的帳號 id
+  const OLD_LINK_KEY = 'azki-cloud-user';      // 第 1 階段的舊鍵（只代表繳稅紀錄簿）
   const PENDING_KEY = 'azki-cloud-pending-v1'; // 待同步的修改 { user, books: { ledger: { key: qty } } }
   const LANG_KEY = 'azki-ledger-lang';
   const PUSH_DELAY = 900;
@@ -25,9 +26,10 @@
       login: 'Google 登入', logout: '登出', syncNow: '立即同步',
       'st.idle': '已同步 ✓', 'st.syncing': '同步中…', 'st.pending': n => `等待同步（${n} 筆）`,
       'st.offline': n => `離線中，連線後會同步（${n} 筆）`, 'st.error': '同步失敗，稍後會自動重試',
-      'st.off': '這一頁的紀錄尚未開放同步',
       'cf.title': '本機和雲端的紀錄不同',
-      'cf.desc': (l, r) => `這台裝置有 ${l} 種周邊的紀錄，雲端帳號裡有 ${r} 種。要怎麼處理？`,
+      'cf.desc': (b, l, r) => `「${b}」：這台裝置有 ${l} 筆紀錄，雲端帳號裡有 ${r} 筆。要怎麼處理？`,
+      'book.ledger': '繳稅紀錄簿', 'book.voice': 'Voice 收集簿',
+      'st.signedin': '已登入。這一頁沒有需要同步的紀錄。',
       'cf.merge': '合併', 'cf.merge.desc': '兩邊的紀錄都保留，同一件取較大的數量',
       'cf.cloud': '以雲端為準', 'cf.cloud.desc': '用雲端的紀錄取代這台裝置的紀錄',
       'menu.label': '帳號選單', 'login.failed': '登入失敗，請再試一次。',
@@ -37,10 +39,11 @@
       login: 'Google でログイン', logout: 'ログアウト', syncNow: '今すぐ同期',
       'st.idle': '同期済み ✓', 'st.syncing': '同期中…', 'st.pending': n => `同期待ち（${n} 件）`,
       'st.offline': n => `オフライン：接続後に同期します（${n} 件）`, 'st.error': '同期に失敗しました。自動で再試行します',
-      'st.off': 'このページの記録はまだ同期に対応していません',
       'cf.title': 'この端末とクラウドの記録が異なります',
-      'cf.desc': (l, r) => `この端末には ${l} 種類、クラウドには ${r} 種類の記録があります。どうしますか？`,
-      'cf.merge': '統合する', 'cf.merge.desc': '両方の記録を残し、同じグッズは多い方の数量にします',
+      'cf.desc': (b, l, r) => `「${b}」：この端末には ${l} 件、クラウドには ${r} 件の記録があります。どうしますか？`,
+      'book.ledger': '納税記録簿', 'book.voice': 'ボイスコレクション',
+      'st.signedin': 'ログイン中です。このページには同期する記録がありません。',
+      'cf.merge': '統合する', 'cf.merge.desc': '両方の記録を残し、同じ項目は多い方の数量にします',
       'cf.cloud': 'クラウドを優先', 'cf.cloud.desc': 'この端末の記録をクラウドの記録で置き換えます',
       'menu.label': 'アカウントメニュー', 'login.failed': 'ログインに失敗しました。もう一度お試しください。',
       'logout.note': 'ログアウト後も、記録はこの端末に残ります。'
@@ -159,42 +162,55 @@
   }
 
   /* ---------------- 登入後的初次同步 ---------------- */
+  const linkKey = book => LINK_KEY + book;
+  function migrateOldLink() {
+    const old = store.get(OLD_LINK_KEY);
+    if (old && !store.get(linkKey('ledger'))) store.set(linkKey('ledger'), old);
+    if (old) store.del(OLD_LINK_KEY);
+  }
+
+  // 這台裝置第一次把某本紀錄和這個帳號連結：比較本機與雲端
+  async function linkBook(book) {
+    delete pending.books[book];                         // 不屬於這個帳號的待同步內容
+    const local = books[book].get();
+    const remote = await pullAll(book);
+    base[book] = clone(remote);
+    if (!stats(local) || sameOwned(local, remote)) {
+      applyRemote(book, remote);
+    } else if (!stats(remote)) {
+      queueDiff(book, local);                           // 雲端是空的 → 上傳本機
+    } else {
+      const choice = await askConflict(book, stats(local), stats(remote));
+      if (choice === 'merge') {
+        const m = clone(remote);
+        Object.keys(local).forEach(k => { m[k] = Math.max(m[k] || 0, local[k]); });
+        queueDiff(book, m);
+        books[book].apply(clone(m));
+      } else {
+        applyRemote(book, remote);
+      }
+    }
+    savePending();
+    store.set(linkKey(book), user.id);
+  }
+
+  /* ---------------- 登入後的初次同步 ---------------- */
   async function startSync() {
     if (!user || startedFor === user.id) return;
     startedFor = user.id;
     ready = false;
+    migrateOldLink();
     loadPending();
-    const linked = store.get(LINK_KEY);
+    if (pending.user !== user.id) pending = { user: user.id, books: {} };
     try {
       setStatus('syncing');
-      if (linked !== user.id || pending.user !== user.id) {
-        // 這台裝置第一次和這個帳號連結：之前的待同步內容不屬於這個帳號，清掉重來
-        pending = { user: user.id, books: {} };
-        for (const book of Object.keys(books)) {
-          const local = books[book].get();
-          const remote = await pullAll(book);
-          base[book] = clone(remote);
-          if (!stats(local) || sameOwned(local, remote)) {
-            applyRemote(book, remote);
-          } else if (!stats(remote)) {
-            queueDiff(book, local);                     // 雲端是空的 → 上傳本機
-          } else {
-            const choice = await askConflict(stats(local), stats(remote));
-            if (choice === 'merge') {
-              const m = clone(remote);
-              Object.keys(local).forEach(k => { m[k] = Math.max(m[k] || 0, local[k]); });
-              queueDiff(book, m);
-              books[book].apply(clone(m));
-            } else {
-              applyRemote(book, remote);
-            }
-          }
-        }
-        savePending();
-        store.set(LINK_KEY, user.id);
-      } else {
-        await push();                                   // 先送出上次沒送完的
-        for (const book of Object.keys(books)) applyRemote(book, await pullAll(book));
+      const toLink = Object.keys(books).filter(b => store.get(linkKey(b)) !== user.id);
+      toLink.forEach(b => { delete pending.books[b]; });
+      savePending();
+      if (pendingCount()) await push();                 // 先送出上次沒送完的（含其他頁面的紀錄）
+      for (const book of Object.keys(books)) {
+        if (toLink.includes(book)) await linkBook(book);
+        else applyRemote(book, await pullAll(book));
       }
       ready = true;
       if (pendingCount()) await push(); else setStatus('idle');
@@ -218,11 +234,11 @@
   }
 
   /* ---------------- 衝突選擇視窗 ---------------- */
-  function askConflict(localN, remoteN) {
+  function askConflict(book, localN, remoteN) {
     return new Promise(resolve => {
       const dlg = document.createElement('dialog');
       dlg.className = 'dlg';
-      dlg.innerHTML = `<h2>${esc(t('cf.title'))}</h2><p>${esc(t('cf.desc', localN, remoteN))}</p>
+      dlg.innerHTML = `<h2>${esc(t('cf.title'))}</h2><p>${esc(t('cf.desc', t('book.' + book), localN, remoteN))}</p>
         <form method="dialog" class="im-actions">
           <button type="submit" value="merge" class="btn im-opt" autofocus><b>${esc(t('cf.merge'))}</b><small>${esc(t('cf.merge.desc'))}</small></button>
           <button type="submit" value="cloud" class="btn ghost im-opt"><b>${esc(t('cf.cloud'))}</b><small>${esc(t('cf.cloud.desc'))}</small></button>
@@ -238,7 +254,7 @@
   let box = null;
   function setStatus(s) { status = s; renderUI(); }
   function statusText() {
-    if (!Object.keys(books).length) return t('st.off');
+    if (!Object.keys(books).length) return t('st.signedin');
     const n = pendingCount();
     if (status === 'syncing') return t('st.syncing');
     if (status === 'offline') return t('st.offline', n);
@@ -257,7 +273,7 @@
     const meta = user.user_metadata || {};
     const name = meta.full_name || meta.name || user.email || '';
     const pic = meta.avatar_url || meta.picture || '';
-    const dot = { idle: 'ok', syncing: 'busy', pending: 'busy', offline: 'warn', error: 'warn' }[status] || 'ok';
+    const dot = !Object.keys(books).length ? 'ok' : ({ idle: 'ok', syncing: 'busy', pending: 'busy', offline: 'warn', error: 'warn' }[status] || 'ok');
     const open = box.querySelector('.auth-menu') && !box.querySelector('.auth-menu').hidden;
     box.innerHTML = `<button type="button" class="avatar-btn" data-act="menu" aria-haspopup="true" aria-expanded="${open}" aria-label="${esc(t('menu.label'))}">
         ${pic ? `<img src="${esc(pic)}" alt="" referrerpolicy="no-referrer">` : `<span>${esc((name || '?').slice(0, 1).toUpperCase())}</span>`}
@@ -282,7 +298,8 @@
   async function signOut() {
     try { if (pendingCount()) await push(); } catch (e) { /* ignore */ }
     await client.auth.signOut();
-    store.del(LINK_KEY);                                  // 下次登入重新比較本機與雲端
+    ['ledger', 'voice'].forEach(b => store.del(linkKey(b)));   // 下次登入重新比較本機與雲端
+    store.del(OLD_LINK_KEY);
     store.del(PENDING_KEY);
     pending = { user: null, books: {} };
     startedFor = null; ready = false; user = null;
