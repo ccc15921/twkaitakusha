@@ -11,6 +11,9 @@ css/style.css        兩頁共用樣式（主色 #d11c76 / #f4348b / #FC3488）
 js/app.js            繳稅紀錄簿：讀取 CSV、分組、篩選、繳稅紀錄
 js/voice.js          Voice 收集簿：讀取 AZKi voice 分頁 CSV、分組、篩選、收集紀錄
 tools/download_images.py  把 CSV 裡所有縮圖下載備份到 img_backup/
+card.html            會員証產生器
+js/card.js           會員証：在底圖寫上名字／編號並下載 PNG
+img/                 會員証底圖（card.png 含預設編號、card_blank.png 已去除編號）
 log.html             網頁更新日記（更新紀錄＋尚未加入的周邊企劃）
 js/log.js            更新日記：讀取兩個 CSV 分頁並顯示
 js/transfer.js       紀錄轉移的編碼／解碼與 QR Code（繳稅紀錄簿用）
@@ -92,4 +95,15 @@ python tools/download_images.py
 - 可重複執行，已下載的會略過；`--retry` 只重試失敗的。結果記錄在 `img_backup/manifest.csv`。
 - 備份只是存檔用，網頁目前仍使用原本的圖片網址。
 - 圖片著作權屬於 COVER 株式会社及各權利人；若 repo 是公開的，上傳備份等於公開轉載，請自行評估（也可以把 `img_backup/` 加進 `.gitignore`，只留在本機）。
+
+## 會員証產生器（card.html）
+
+- **目前為隱藏頁面**：導覽列沒有連結，只能直接輸入網址 `…/card.html` 進入，並加了 `noindex` 避免被搜尋引擎收錄。要公開時，在各頁導覽列加上 `<li><a href="card.html" data-i18n="nav.card">會員証</a></li>` 即可（`nav.card` 文字已經在各頁的 I18N 裡）。
+- 名字可用滑桿在欄位內左右移動，另有「置中」按鈕。
+
+- 使用者輸入名字，網頁用 `<canvas>` 把名字畫在底圖的 Name 欄，按「下載圖片」存成 PNG（輸出為底圖的 2 倍大小）。名字與編號只在瀏覽器內處理，不會上傳。
+- 會員編號選項：預設（圖上原本的 00001234）、自己輸入（最多 8 位數字，不足補 0）、隨機產生、不顯示。後三種使用 `img/card_blank.png`（編號已去除）再畫上金色數字。
+- 名字太長會自動縮小字體；版面座標集中在 `js/card.js`：Name 欄 `NAME_BOX`、編號位置 `NUM_X0`／`NUM_PITCH`／`NUM_Y0`，換底圖時只要改這裡。
+- 名字字體可選：黑體（Noto Sans TC/JP）、圓體（Chiron GoRound TC／M PLUS Rounded 1c）、明體（Noto Serif TC/JP）、楷體手寫（LXGW WenKai TC／Klee One）、粗圓流行（Dela Gothic One）、英文手寫（Pacifico）。編號不使用字體，而是依原圖數字的形狀用線條畫出 0–9（`js/card.js` 的 `GLYPHS`）。全部來自 Google Fonts，在 `card.html` 各自用獨立的 `<link>` 載入（其中一個失敗不會影響其他字體）；字體清單在 `js/card.js` 的 `FONTS`。
+- 底圖若要換成更大的原圖，直接覆蓋 `img/card.png`；`img/card_blank.png` 需同尺寸、且把右下角編號去掉。
 

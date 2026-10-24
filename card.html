@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>開拓者組合會員証｜開拓者の愉悅部</title>
+  <meta name="description" content="輸入名字，產生專屬的開拓者組合會員証圖片。非官方粉絲製作。">
+  <meta name="theme-color" content="#f4348b">
+  <meta name="robots" content="noindex">
+  <script>
+    /* 先套用主題，避免閃白（與其他頁面共用設定） */
+    try {
+      var th = localStorage.getItem('azki-ledger-theme');
+      if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topnav" aria-label="Site">
+      <a class="brand" href="./" data-i18n="brand">開拓者の愉悅部</a>
+      <ul class="pages">
+        <li><a href="./" data-i18n="nav.ledger">繳稅紀錄簿</a></li>
+        <li><a href="voice.html" data-i18n="nav.voice">Voice 收集簿</a></li>
+        <li><a href="card.html" aria-current="page" data-i18n="nav.card">會員証</a></li>
+        <li><a href="log.html" data-i18n="nav.log">更新日記</a></li>
+      </ul>
+      <div class="nav-tools">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh-Hant">繁中</button>
+          <button type="button" data-lang="ja">日本語</button>
+        </div>
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="切換深色模式"></button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <p class="eyebrow">PIONEERS MEMBER CARD</p>
+      <h1 data-i18n="title">開拓者組合會員証</h1>
+      <p class="lead" data-i18n="lead"></p>
+    </div>
+  </header>
+
+  <main class="cardpage">
+    <section class="card-preview" aria-live="polite">
+      <canvas id="card-canvas" role="img" data-i18n-aria="card.alt"></canvas>
+      <p class="state" id="card-state" data-i18n="loading">圖片讀取中…</p>
+    </section>
+
+    <section class="card-form">
+      <label class="field">
+        <span class="field-label" data-i18n="name.label">名字</span>
+        <input type="text" id="in-name" maxlength="24" autocomplete="off" data-i18n-ph="name.ph">
+      </label>
+
+      <div class="field">
+        <span class="field-label" id="pos-label" data-i18n="pos.label">名字位置</span>
+        <div class="pos-row">
+          <span class="pos-end" data-i18n="pos.left">靠左</span>
+          <input type="range" id="in-pos" min="0" max="100" step="1" value="0" aria-labelledby="pos-label">
+          <span class="pos-end" data-i18n="pos.right">靠右</span>
+          <button type="button" class="btn ghost small" id="btn-center" data-i18n="pos.center">置中</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="field-label" data-i18n="font.label">名字字體</span>
+        <select id="in-font">
+          <option value="sans" data-i18n="font.sans">黑體</option>
+          <option value="round" data-i18n="font.round">圓體</option>
+          <option value="serif" data-i18n="font.serif">明體</option>
+          <option value="kai" data-i18n="font.kai">楷體手寫</option>
+          <option value="pop" data-i18n="font.pop">粗圓流行</option>
+          <option value="script" data-i18n="font.script">英文手寫</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field-label" data-i18n="num.label">會員編號</span>
+        <select id="in-mode">
+          <option value="default" data-i18n="num.default">預設（00001234）</option>
+          <option value="custom" data-i18n="num.custom">自己輸入</option>
+          <option value="random" data-i18n="num.random">隨機產生</option>
+          <option value="none" data-i18n="num.none">不顯示編號</option>
+        </select>
+      </label>
+
+      <label class="field" id="row-custom" hidden>
+        <span class="field-label" data-i18n="num.custom.label">編號（最多 8 位數字，不足補 0）</span>
+        <input type="text" id="in-num" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" placeholder="00001234">
+      </label>
+
+      <div class="field" id="row-random" hidden>
+        <button type="button" class="btn ghost" id="btn-random" data-i18n="num.reroll">重新產生編號</button>
+        <span class="rand-val" id="rand-val"></span>
+      </div>
+
+      <button type="button" class="btn dl-btn" id="btn-download" disabled data-i18n="btn.download">下載圖片（PNG）</button>
+      <p class="card-note" data-i18n="note"></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p data-i18n="footer1"></p>
+    <p data-i18n="footer2"></p>
+    <p class="updated"><span data-i18n="updated">最後更新</span>：<time datetime="2026-10-24">2026/10/24</time></p>
+  </footer>
+
+  <script src="js/card.js"></script>
+  <script src="js/totop.js"></script>
+</body>
+</html>

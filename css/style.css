@@ -113,10 +113,10 @@ button, input, select { font: inherit; color: inherit; }
   color: var(--accent-text); font-size: 1.05rem;
 }
 .brand span { color: var(--pink-bright); }
-.pages { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; }
+.pages { list-style: none; display: flex; gap: 6px; margin: 0; padding: 0; flex-wrap: wrap; }
 .pages a {
   display: block; padding: 6px 12px; border-radius: 999px; text-decoration: none;
-  font-weight: 500; font-size: .9rem; color: var(--ink-soft);
+  font-weight: 500; font-size: .9rem; color: var(--ink-soft); white-space: nowrap;
 }
 .pages a[aria-current="page"] { background: var(--pink); color: #fff; }
 
@@ -454,3 +454,29 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
 }
 .to-top:hover { background: var(--pink-deep); }
 .to-top:focus-visible { outline: 3px solid var(--pink-soft); outline-offset: 2px; }
+
+/* ---------- member card page (card.html) ---------- */
+.cardpage { max-width: 960px; margin: 0 auto; padding: 8px 16px 48px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.card-preview { position: sticky; top: 12px; }
+#card-canvas { display: block; width: 100%; height: auto; aspect-ratio: 654 / 418; border-radius: 16px; box-shadow: var(--shadow); background: var(--surface); }
+.card-preview .state { padding: 8px 0; }
+.card-form { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field-label { font-size: .85rem; font-weight: 700; color: var(--ink-soft); }
+.field input[type="text"], .field select {
+  width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 12px;
+  border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; outline: none;
+}
+.field input[type="text"]:focus, .field select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-soft); }
+.rand-val { font-family: var(--font-round); font-size: 1.1rem; letter-spacing: .12em; color: var(--accent-text); }
+#row-random { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dl-btn { padding: 12px 20px; }
+.dl-btn:disabled { opacity: .5; cursor: not-allowed; }
+.pos-row { display: flex; align-items: center; gap: 10px; }
+.pos-row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--pink); }
+.pos-end { font-size: .8rem; color: var(--ink-soft); white-space: nowrap; }
+.card-note { margin: 0; font-size: .85rem; color: var(--ink-soft); }
+@media (max-width: 760px) {
+  .cardpage { grid-template-columns: 1fr; gap: 20px; }
+  .card-preview { position: static; }
+}
