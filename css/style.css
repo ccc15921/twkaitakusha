@@ -647,3 +647,14 @@ a.rk-name:hover { color: var(--accent-text); }
   .data-tools > .filter-label { display: none; }
   .data-tools .btn { white-space: normal; line-height: 1.25; font-size: .78rem; padding: 6px 6px; min-height: 38px; }
 }
+.item-foot .count-badge { white-space: normal; line-height: 1.3; }
+/* 手機版企劃卡片：封面＋日期／標題在上，按鈕列改成整列寬度，避免按鈕掉到第二行 */
+@media (max-width: 640px) {
+  .project-head, .vhead { row-gap: 4px; align-items: start; }
+  .project-meta { display: contents; }
+  .project-head > .project-cover, .vhead > .project-cover { grid-column: 1; grid-row: 1 / span 3; }
+  .project-tags, .project-meta h2, .project-note { grid-column: 2; }
+  .project-actions { grid-column: 1 / -1; margin-top: 6px; gap: 6px; }
+  .project-actions .expand-btn { margin-left: auto; }
+  .project-actions .btn { padding: 6px 12px; font-size: .82rem; }
+}
