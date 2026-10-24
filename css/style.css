@@ -619,3 +619,31 @@ a.rk-name:hover { color: var(--accent-text); }
 .tag.danger { background: #e0464e; color: #fff; }
 .muted { color: var(--ink-soft); }
 .ad-avatar a { display: block; width: 100%; height: 100%; }
+
+/* ---------- 手機版頁首：第一列品牌＋工具，第二列分頁（單列，放不下可左右滑） ---------- */
+@media (max-width: 640px) {
+  .topnav {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand tools" "pages pages";
+    gap: 8px; padding: 10px 12px 8px;
+  }
+  .brand { grid-area: brand; font-size: .98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nav-tools { grid-area: tools; gap: 6px; margin-left: 0; }
+  .pages {
+    grid-area: pages; flex-wrap: nowrap; gap: 2px; overflow-x: auto;
+    margin: 0 -12px; padding: 0 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .pages::-webkit-scrollbar { display: none; }
+  .pages a { padding: 5px 8px; font-size: .85rem; }
+  .lang-switch button { padding: 3px 8px; font-size: .72rem; }
+  .icon-btn, .avatar-btn { width: 30px; height: 30px; font-size: .9rem; }
+  .login-btn { padding: 4px 8px; }
+  .hero { padding: 10px 16px 16px; }
+  .eyebrow { font-size: .62rem; margin-bottom: 2px; }
+  .hero h1 { font-size: 1.7rem; }
+  .lead { margin: 6px 0 2px; font-size: .88rem; }
+}
+@media (max-width: 640px) {
+  .data-tools > .filter-label { display: none; }
+  .data-tools .btn { white-space: normal; line-height: 1.25; font-size: .78rem; padding: 6px 6px; min-height: 38px; }
+}
