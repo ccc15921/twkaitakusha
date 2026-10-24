@@ -285,11 +285,10 @@
             ${imgTag(p.cover, p.name)}
           </button>
           <div class="project-meta">
-            <div class="project-tags"><span class="project-date">${esc(fmtDate(p))}</span>${tags}</div>
+            <div class="project-tags"><span class="project-date">${esc(fmtDate(p))}</span>${tags}${countBadge(state.counts && (state.counts.projects[p.code] || 0), 'cnt.project')}</div>
             <h2>${esc(p.name)}</h2>
             <div class="project-actions">
               <span class="project-progress"><b>${s.n}</b> / ${s.total} ${esc(t('unit.count'))}</span>
-              ${countBadge(state.counts && (state.counts.projects[p.code] || 0), 'cnt.project')}
               ${p.url ? `<a class="btn ghost small" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t('link.official'))}</a>` : ''}
               ${allBtn}
             </div>
