@@ -15,7 +15,7 @@
       'doc.title': 'AZKi Voice 收集簿｜開拓者の愉悅部',
       'doc.desc': '整理 AZKi 參與的官方ボイス商品，記錄自己收集了哪些。非官方粉絲製作。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.log': '更新日記',
+      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.ranking': '排行榜', 'nav.log': '更新日記',
       title: 'AZKi Voice 收集簿',
       lead: '整理 AZKi 參與的官方ボイス商品。點「收集」標記已入手的 Voice，紀錄會存在你這台裝置的瀏覽器裡；用 Google 登入後，還能同步到其他裝置。',
       'stat.count': '已收集', 'stat.unit': '件', 'stat.complete': '全收集企劃', 'stat.bar': '收集進度',
@@ -29,6 +29,7 @@
       'btn.export': '匯出備份', 'btn.import': '匯入備份',
       result: (a, b) => `共 ${a} 個企劃・${b} 件 Voice`,
       empty: '找不到符合條件的 Voice。',
+      'cnt.item': n => `${n} 人`, 'cnt.project': n => `${n} 人收集`, 'cnt.title': '本站開拓者中的收集人數',
       more: n => `顯示更多（還有 ${n} 個企劃）`,
       loading: 'Voice 清單讀取中…',
       failed: 'Voice 清單讀取失敗，請稍後再試。', retry: '重新讀取',
@@ -51,7 +52,7 @@
       'doc.title': 'AZKi ボイスコレクション｜開拓者の愉悅部',
       'doc.desc': 'AZKi が参加した公式ボイス商品の一覧と、自分の収集記録。非公式ファンサイトです。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.log': '更新日記',
+      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.ranking': 'ランキング', 'nav.log': '更新日記',
       title: 'AZKi ボイスコレクション',
       lead: 'AZKi が参加した公式ボイス商品の一覧です。「収集」を押して入手済みのボイスをチェック。記録はこの端末のブラウザに保存され、Google でログインすると他の端末とも同期できます。',
       'stat.count': '収集済み', 'stat.unit': '点', 'stat.complete': 'コンプ企画', 'stat.bar': '収集の進み具合',
@@ -65,6 +66,7 @@
       'btn.export': 'バックアップを書き出す', 'btn.import': 'バックアップを読み込む',
       result: (a, b) => `${a} 企画・${b} 点`,
       empty: '条件に合うボイスが見つかりません。',
+      'cnt.item': n => `${n} 人`, 'cnt.project': n => `${n} 人が収集`, 'cnt.title': '本サイトの開拓者のうち収集した人数',
       more: n => `もっと見る（残り ${n} 企画）`,
       loading: 'ボイス一覧を読み込み中…',
       failed: '読み込みに失敗しました。しばらくしてからもう一度お試しください。', retry: '再読み込み',
@@ -197,6 +199,7 @@
   const PAGE_SIZE = 10;
   const state = {
     shown: PAGE_SIZE,   // 目前顯示幾個企劃
+    counts: null,       // 收集人數統計
     view: [],           // 目前篩選後的企劃清單
     projects: [],
     owned: loadOwned(),
@@ -249,11 +252,16 @@
     return { n, total: p.items.length, complete: n === p.items.length };
   }
 
+  function countBadge(n, key) {
+    if (n === null || n === undefined || n === false) return '';
+    return `<span class="count-badge" title="${esc(t('cnt.title'))}">👥 ${esc(t(key, n))}</span>`;
+  }
   function voiceHTML(it) {
     const owned = !!state.owned[it.key];
     return `
       <li class="voice${owned ? ' owned' : ''}" data-key="${esc(it.key)}">
         <span class="voice-name">${esc(it.name)}</span>
+        ${countBadge(state.counts && (state.counts.items[it.key] || 0), 'cnt.item')}
         <button type="button" class="collect-btn" data-toggle="${esc(it.key)}" aria-pressed="${owned}">
           ${esc(owned ? t('collected') : t('collect'))}
         </button>
@@ -281,6 +289,7 @@
             <h2>${esc(p.name)}</h2>
             <div class="project-actions">
               <span class="project-progress"><b>${s.n}</b> / ${s.total} ${esc(t('unit.count'))}</span>
+              ${countBadge(state.counts && (state.counts.projects[p.code] || 0), 'cnt.project')}
               ${p.url ? `<a class="btn ghost small" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t('link.official'))}</a>` : ''}
               ${allBtn}
             </div>
@@ -503,6 +512,25 @@
     updateThemeButton();
   }
 
+  // 從排行榜點過來（…/#item=企劃代號#Voice）：捲動到那個 Voice
+  function focusFromHash() {
+    const m = /^#item=(.+)$/.exec(location.hash);
+    if (!m) return;
+    const key = decodeURIComponent(m[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    const list = visibleProjects();
+    const idx = list.findIndex(x => x.items.some(it => it.key === key));
+    if (idx < 0) return;
+    state.shown = Math.max(state.shown, Math.ceil((idx + 1) / PAGE_SIZE) * PAGE_SIZE);
+    render();
+    const el = document.querySelector(`.voice[data-key="${CSS.escape(key)}"]`);
+    if (el) {
+      el.scrollIntoView({ block: 'center' });
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 2400);
+    }
+  }
+
   /* ---------------- init ---------------- */
   async function load() {
     $('#list').innerHTML = `<p class="state">${esc(t('loading'))}</p>`;
@@ -512,6 +540,7 @@
       state.projects = buildProjects(parseCSV(await res.text()));
       buildFilterOptions();
       render();
+      focusFromHash();
     } catch (err) {
       $('#list').innerHTML = `<div class="state"><p>${esc(t('failed'))}</p>
         <button type="button" class="btn" id="retry">${esc(t('retry'))}</button></div>`;
@@ -537,6 +566,7 @@
           }
         }
       });
+      window.AzkiCloud.getCounts('voice').then(c => { if (c) { state.counts = c; if (state.projects.length) render(); } });
     }
   }
   if (typeof module !== 'undefined') module.exports = { parseCSV, buildProjects, normName };

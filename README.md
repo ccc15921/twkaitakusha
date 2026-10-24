@@ -14,6 +14,10 @@ tools/download_images.py  把 CSV 裡所有縮圖下載備份到 img_backup/
 card.html            會員証產生器
 js/card.js           會員証：在底圖寫上名字／編號並下載 PNG
 img/                 會員証底圖（card.png 含預設編號、card_blank.png 已去除編號）
+ranking.html         排行榜（熱門周邊／熱門 Voice／Voice 完成率）
+js/ranking.js        排行榜：讀兩份 CSV＋Supabase 統計函式
+admin.html           管理頁（只有 admins 名單內的帳號能用）
+js/admin.js          管理頁：檢舉、頭像、暱稱管理
 log.html             網頁更新日記（更新紀錄＋尚未加入的周邊企劃）
 js/log.js            更新日記：讀取兩個 CSV 分頁並顯示
 js/transfer.js       紀錄轉移的編碼／解碼與 QR Code（繳稅紀錄簿用）
@@ -121,3 +125,19 @@ python tools/download_images.py
 - 刪除帳號：頭像選單最下方「刪除帳號」，勾選確認後呼叫資料庫函式 `delete_my_account()`，連同所有雲端紀錄與個人資料一起刪除（本機紀錄保留）。需先執行 `supabase/002_account_keepalive.sql`。
 - 保持活躍：`.github/workflows/keepalive.yml` 每 3 天呼叫 `keepalive()`，避免免費專案閒置一週被暫停；可在 GitHub 的 Actions 分頁手動執行測試。注意 GitHub 會在 repo 連續 60 天沒有任何活動時自動停用排程，屆時到 Actions 分頁重新啟用即可。
 - 詳細規劃見 Project 文件「會員系統規劃（Supabase）」。
+
+## 排行榜、個人設定與管理（第 4＋5 階段）
+
+需先在 SQL Editor 執行 `supabase/003_ranking_profiles_admin.sql`，並把自己加進管理員名單（見下方）。
+
+- **購買人數**：繳稅紀錄簿與 Voice 收集簿的每件項目、每個企劃顯示「👥 N 人」。資料來自 `get_item_counts`／`get_project_counts`（只回傳人數，未登入也能讀；排除在個人設定關閉「計入統計」的人）。
+- **排行榜** `ranking.html`：分頁籤「熱門周邊」「熱門 Voice」「Voice 完成率」（網址 `#goods`／`#voice`／`#completion` 可直接連到該分頁籤）。可篩選年份、周邊種類、顯示筆數。點熱門項目會跳到紀錄簿並展開、標示那一件（`index.html#item=企劃代號#編號`、`voice.html#item=…`）。
+- **Voice 完成率**：網頁把目前年份的 Voice 清單（由 CSV 產生）傳給 `get_voice_completion`，伺服器只計算參加者收集了其中幾個，所以 CSV 新增／刪除 Voice 會自動反映，不需要另外同步清單。只列出開啟「參加完成率排行榜」且設定了暱稱的人。周邊不做完成率排行榜（Full set 只算 1 件，完成率不準）。
+- **個人設定**（頭像選單 → 個人設定）：暱稱、頭像（瀏覽器內置中裁成正方形、縮成 256×256 WebP／JPEG、100KB 以內，存到 Storage 的 `avatars` bucket，檔名＝使用者 id）、參加完成率排行榜、計入購買人數統計。刪除帳號時會一併刪除頭像檔。
+- **檢舉**：排行榜上其他人的列有「檢舉」，可選不當頭像／不當暱稱；同一人對同一項只能檢舉一次；被 3 個不同的人檢舉會自動隱藏。本人換新頭像／新暱稱會自動解除隱藏。
+- **管理頁** `admin.html`（不在導覽列）：列出有檢舉、有頭像或暱稱的使用者，可隱藏／恢復／刪除頭像、隱藏／恢復／清除暱稱、停用／恢復上傳、移出／放回排行榜、檢舉結案。所有操作都由資料庫函式檢查是否為管理員。
+- **設定管理員**：在 SQL Editor 執行（把 email 換成自己的 Google 帳號）：
+  ```sql
+  insert into public.admins (user_id) select id from auth.users where email = 'your-email@gmail.com' on conflict do nothing;
+  ```
+

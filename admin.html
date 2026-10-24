@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>管理頁｜開拓者の愉悅部</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f4348b">
+  <script>
+    try {
+      var th = localStorage.getItem('azki-ledger-theme');
+      if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th);
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=20261024f">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topnav" aria-label="Site">
+      <a class="brand" href="./">開拓者の愉悅部</a>
+      <ul class="pages">
+        <li><a href="ranking.html">排行榜</a></li>
+        <li><a href="admin.html" aria-current="page">管理頁</a></li>
+      </ul>
+      <div class="nav-tools"></div>
+    </nav>
+    <div class="hero">
+      <p class="eyebrow">ADMIN</p>
+      <h1>管理頁</h1>
+      <p class="lead">處理檢舉、檢查頭像與暱稱。只有管理員帳號可以使用；權限由資料庫判斷。</p>
+    </div>
+  </header>
+
+  <main class="adpage">
+    <p class="state" id="ad-state">讀取中…</p>
+    <div id="ad-body" hidden>
+      <div class="ad-tools">
+        <label><input type="checkbox" id="ad-only-reported"> 只顯示有檢舉的使用者</label>
+        <button type="button" class="btn ghost small" id="ad-reload">重新整理</button>
+      </div>
+      <ul class="ad-list" id="ad-list"></ul>
+    </div>
+  </main>
+
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/cloud.js?v=20261024f"></script>
+  <script src="js/admin.js?v=20261024f"></script>
+</body>
+</html>

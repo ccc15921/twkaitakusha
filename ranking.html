@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>排行榜｜開拓者の愉悅部</title>
+  <meta name="description" content="本站開拓者的熱門周邊、熱門 Voice 與 Voice 完成率排行榜。非官方粉絲製作。">
+  <meta name="theme-color" content="#f4348b">
+  <script>
+    try {
+      var th = localStorage.getItem('azki-ledger-theme');
+      if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;800&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=20261024f">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topnav" aria-label="Site">
+      <a class="brand" href="./" data-i18n="brand">開拓者の愉悅部</a>
+      <ul class="pages">
+        <li><a href="./" data-i18n="nav.ledger">繳稅紀錄簿</a></li>
+        <li><a href="voice.html" data-i18n="nav.voice">Voice 收集簿</a></li>
+        <li><a href="ranking.html" aria-current="page" data-i18n="nav.ranking">排行榜</a></li>
+        <li><a href="log.html" data-i18n="nav.log">更新日記</a></li>
+      </ul>
+      <div class="nav-tools">
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" data-lang="zh-Hant">繁中</button>
+          <button type="button" data-lang="ja">日本語</button>
+        </div>
+        <button type="button" class="icon-btn" id="btn-theme" aria-label="切換深色模式"></button>
+      </div>
+    </nav>
+    <div class="hero">
+      <p class="eyebrow">PIONEERS RANKING</p>
+      <h1 data-i18n="title">排行榜</h1>
+      <p class="lead" data-i18n="lead"></p>
+    </div>
+  </header>
+
+  <main class="rkpage">
+    <div class="rk-tabs" role="tablist">
+      <button type="button" role="tab" data-tab="goods" data-i18n="tab.goods">熱門周邊</button>
+      <button type="button" role="tab" data-tab="voice" data-i18n="tab.voice">熱門 Voice</button>
+      <button type="button" role="tab" data-tab="completion" data-i18n="tab.completion">Voice 完成率</button>
+    </div>
+
+    <div class="rk-filters">
+      <label><span data-i18n="f.year">年份</span>
+        <select id="rk-year"><option value="all">全部</option></select>
+      </label>
+      <label id="rk-type-wrap"><span data-i18n="f.type">種類</span>
+        <select id="rk-type"><option value="all">全部</option></select>
+      </label>
+      <label><span data-i18n="f.top">顯示</span>
+        <select id="rk-top">
+          <option value="10">Top 10</option>
+          <option value="20" selected>Top 20</option>
+          <option value="50">Top 50</option>
+          <option value="100">Top 100</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="rk-note" id="rk-note"></p>
+    <ol class="rk-list" id="rk-list"><li class="state" data-i18n="loading">讀取中…</li></ol>
+  </main>
+
+  <footer class="site-footer">
+    <p data-i18n="footer1"></p>
+    <p class="footer-links"><a href="privacy.html">隱私權政策 / プライバシーポリシー</a></p>
+  </footer>
+
+  <script src="js/vendor/supabase.js"></script>
+  <script src="js/cloud.js?v=20261024f"></script>
+  <script src="js/ranking.js?v=20261024f"></script>
+  <script src="js/totop.js"></script>
+</body>
+</html>

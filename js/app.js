@@ -17,7 +17,7 @@
       'doc.title': '開拓者繳稅紀錄簿｜AZKi 周邊收集清單',
       'doc.desc': '給開拓者們的 AZKi 周邊收集清單。非官方粉絲製作。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.log': '更新日記',
+      'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.ranking': '排行榜', 'nav.log': '更新日記',
       title: '開拓者繳稅紀錄簿',
       lead: '將每一筆贊助 AZKi Sololive 的繳稅記錄下來。',
       'stat.count': '已繳稅', 'stat.unit': '件', 'stat.yen': '繳稅總額', 'stat.bar': '收集進度',
@@ -34,6 +34,7 @@
       'result.match': (a, b) => `符合 ${a} 個企劃、${b} 件周邊`,
       'result.yen': '符合範圍的繳稅金額',
       empty: '找不到符合條件的周邊。',
+      'cnt.item': n => `${n} 人已繳稅`, 'cnt.project': n => `${n} 人繳稅`, 'cnt.title': '本站開拓者中的繳稅人數',
       more: n => `顯示更多（還有 ${n} 個企劃）`,
       loading: '稅單讀取中…',
       failed: '稅單讀取失敗，請稍後再試。', retry: '重新讀取',
@@ -74,7 +75,7 @@
       'doc.title': '開拓者納税記録簿｜AZKi グッズコレクション',
       'doc.desc': '開拓者のための AZKi グッズ収集リスト。非公式ファンサイトです。',
       brand: '開拓者の愉悅部',
-      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.log': '更新日記',
+      'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.ranking': 'ランキング', 'nav.log': '更新日記',
       title: '開拓者納税記録簿',
       lead: 'AZKi の Sololive を応援するために納めた税を、ひとつずつ記録しよう。',
       'stat.count': '納税済み', 'stat.unit': '点', 'stat.yen': '納税総額', 'stat.bar': '収集の進み具合',
@@ -91,6 +92,7 @@
       'result.match': (a, b) => `該当 ${a} 企画・${b} 点`,
       'result.yen': '該当分の納税額',
       empty: '条件に合うグッズが見つかりません。',
+      'cnt.item': n => `${n} 人が納税`, 'cnt.project': n => `${n} 人が納税`, 'cnt.title': '本サイトの開拓者のうち納税した人数',
       more: n => `もっと見る（残り ${n} 企画）`,
       loading: '納税通知書を読み込み中…',
       failed: '読み込みに失敗しました。しばらくしてからもう一度お試しください。', retry: '再読み込み',
@@ -268,6 +270,7 @@
   const PAGE_SIZE = 10;
   const state = {
     shown: PAGE_SIZE,   // 目前顯示幾個企劃
+    counts: null,       // 購買人數統計 { items: {key: n}, projects: {code: n} }
     view: [],           // 目前篩選後的企劃清單
     projects: [],
     owned: loadOwned(),
@@ -338,6 +341,10 @@
     });
   }
 
+  function countBadge(n, key) {
+    if (n === null || n === undefined || n === false) return '';
+    return `<span class="count-badge" title="${esc(t('cnt.title'))}">👥 ${esc(t(key, n))}</span>`;
+  }
   function itemHTML(it, p) {
     const qty = state.owned[it.key] || 0;
     const owned = qty > 0;
@@ -354,6 +361,7 @@
           <p class="item-name" title="${esc(it.name)}">${esc(it.name)}</p>
           ${it.note ? `<p class="item-note">${esc(it.note)}</p>` : ''}
           <div class="item-foot">
+            ${countBadge(state.counts && (state.counts.items[it.key] || 0), 'cnt.item')}
             ${link}
           </div>
         </div>
@@ -393,6 +401,7 @@
             ${p.note ? `<p class="project-note">${esc(p.note)}</p>` : ''}
             <div class="project-actions">
               <span class="project-progress"><b>${s.n}</b> / ${s.total} ${esc(t('unit.count'))}</span>
+              ${countBadge(state.counts && (state.counts.projects[p.code] || 0), 'cnt.project')}
               ${p.url ? `<a class="btn ghost" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(t('link.official'))}</a>` : ''}
               ${p.xLink ? `<a class="btn ghost" href="${esc(p.xLink)}" target="_blank" rel="noopener">${esc(t('link.x'))}</a>` : ''}
               <button type="button" class="btn expand-btn" data-expand="${esc(p.code)}" aria-expanded="${open}" aria-controls="${esc(itemsId)}">
@@ -711,6 +720,26 @@
     if (state.projects.length) render();
   }
 
+  // 從排行榜點過來（…/#item=企劃代號#編號）：展開該企劃並捲動到那件周邊
+  function focusFromHash() {
+    const m = /^#item=(.+)$/.exec(location.hash);
+    if (!m) return;
+    const key = decodeURIComponent(m[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    const list = visibleProjects();
+    const idx = list.findIndex(x => x.items.some(it => it.key === key));
+    if (idx < 0) return;
+    state.shown = Math.max(state.shown, Math.ceil((idx + 1) / PAGE_SIZE) * PAGE_SIZE);
+    state.expanded.add(list[idx].p.code);
+    render();
+    const el = document.querySelector(`.item[data-key="${CSS.escape(key)}"]`);
+    if (el) {
+      el.scrollIntoView({ block: 'center' });
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 2400);
+    }
+  }
+
   // 開啟 …/#t=payload 這種轉移連結時，先清掉網址上的 #，再詢問要不要匯入
   async function handleHash() {
     const m = /^#t=([A-Za-z0-9_.-]+)/.exec(location.hash);
@@ -777,6 +806,7 @@
       state.projects = buildProjects(parseCSV(await res.text()));
       buildFilterOptions();
       render();
+      focusFromHash();
     } catch (err) {
       $('#list').innerHTML = `<div class="state"><p>${esc(t('failed'))}</p>
         <button type="button" class="btn" id="retry">${esc(t('retry'))}</button></div>`;
@@ -803,6 +833,8 @@
           }
         }
       });
+      // 購買人數統計（未登入也看得到）
+      window.AzkiCloud.getCounts('ledger').then(c => { if (c) { state.counts = c; if (state.projects.length) render(); } });
     }
   }
   if (typeof module !== 'undefined') module.exports = { parseCSV, buildProjects };

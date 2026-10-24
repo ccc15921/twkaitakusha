@@ -37,7 +37,21 @@
       'del.link': '刪除帳號', 'del.title': '刪除帳號',
       'del.desc': '會永久刪除雲端上的所有紀錄（繳稅紀錄簿、Voice 收集簿）、個人設定與帳號，無法復原。這台裝置瀏覽器裡的紀錄會保留。',
       'del.check': '我了解刪除後無法復原', 'del.ok': '永久刪除', 'del.cancel': '取消',
-      'del.done': '帳號已刪除。這台裝置的紀錄仍然保留。', 'del.failed': '刪除失敗，請稍後再試。'
+      'del.done': '帳號已刪除。這台裝置的紀錄仍然保留。', 'del.failed': '刪除失敗，請稍後再試。',
+      'set.link': '個人設定', 'set.title': '個人設定',
+      'set.nick': '暱稱（排行榜上顯示，最多 24 字）', 'set.nick.ph': '例如：開拓者001',
+      'set.avatar': '頭像（排行榜上顯示）', 'set.avatar.pick': '選擇圖片', 'set.avatar.remove': '移除頭像',
+      'set.avatar.note': '會自動裁成正方形並縮小。上傳不當圖片會被移除並停用上傳。',
+      'set.avatar.banned': '你的帳號已被停用頭像上傳。',
+      'set.avatar.hidden': '你的頭像因檢舉暫時隱藏中，換一張新頭像即可恢復顯示。',
+      'set.nick.hidden': '你的暱稱因檢舉暫時隱藏中，改一個新暱稱即可恢復顯示。',
+      'set.join': '參加 Voice 完成率排行榜（公開暱稱、頭像與完成率）',
+      'set.join.need': '要參加排行榜需要先設定暱稱。',
+      'set.stats': '把我的紀錄匿名計入購買人數統計',
+      'set.save': '儲存', 'set.cancel': '取消', 'set.saving': '儲存中…', 'set.saved': '已儲存。',
+      'set.failed': '儲存失敗，請稍後再試。', 'set.upfailed': '頭像上傳失敗，請換一張圖片或稍後再試。',
+      'set.loading': '讀取中…', 'set.badimg': '無法讀取這張圖片。',
+      'set.ranking': '查看排行榜'
     },
     ja: {
       login: 'Google でログイン', logout: 'ログアウト', syncNow: '今すぐ同期',
@@ -54,7 +68,21 @@
       'del.link': 'アカウントを削除', 'del.title': 'アカウントを削除',
       'del.desc': 'クラウド上のすべての記録（納税記録簿・ボイスコレクション）、個人設定、アカウントを完全に削除します。元に戻せません。この端末のブラウザ内の記録は残ります。',
       'del.check': '削除すると元に戻せないことを理解しました', 'del.ok': '完全に削除する', 'del.cancel': 'キャンセル',
-      'del.done': 'アカウントを削除しました。この端末の記録はそのまま残っています。', 'del.failed': '削除に失敗しました。しばらくしてからお試しください。'
+      'del.done': 'アカウントを削除しました。この端末の記録はそのまま残っています。', 'del.failed': '削除に失敗しました。しばらくしてからお試しください。',
+      'set.link': '個人設定', 'set.title': '個人設定',
+      'set.nick': 'ニックネーム（ランキングに表示・24文字まで）', 'set.nick.ph': '例：開拓者001',
+      'set.avatar': 'アイコン（ランキングに表示）', 'set.avatar.pick': '画像を選ぶ', 'set.avatar.remove': 'アイコンを削除',
+      'set.avatar.note': '自動で正方形に切り抜いて縮小します。不適切な画像は削除され、アップロードが停止されます。',
+      'set.avatar.banned': 'このアカウントはアイコンのアップロードが停止されています。',
+      'set.avatar.hidden': '通報によりアイコンが一時的に非表示になっています。新しいアイコンにすると再表示されます。',
+      'set.nick.hidden': '通報によりニックネームが一時的に非表示になっています。新しいニックネームにすると再表示されます。',
+      'set.join': 'ボイスのコンプリート率ランキングに参加（ニックネーム・アイコン・コンプリート率を公開）',
+      'set.join.need': 'ランキングに参加するにはニックネームの設定が必要です。',
+      'set.stats': '自分の記録を購入人数の統計に匿名で含める',
+      'set.save': '保存', 'set.cancel': 'キャンセル', 'set.saving': '保存中…', 'set.saved': '保存しました。',
+      'set.failed': '保存に失敗しました。しばらくしてからお試しください。', 'set.upfailed': 'アイコンのアップロードに失敗しました。別の画像を試すか、しばらくしてからお試しください。',
+      'set.loading': '読み込み中…', 'set.badimg': 'この画像は読み込めません。',
+      'set.ranking': 'ランキングを見る'
     }
   };
   const lang = () => {
@@ -291,6 +319,7 @@
         ${user.email && user.email !== name ? `<p class="auth-mail">${esc(user.email)}</p>` : ''}
         <p class="auth-status"><i class="sync-dot ${dot}"></i>${esc(statusText())}</p>
         ${Object.keys(books).length ? `<button type="button" class="btn ghost small" data-act="sync">${esc(t('syncNow'))}</button>` : ''}
+        <button type="button" class="btn ghost small" data-act="settings">${esc(t('set.link'))}</button>
         <button type="button" class="btn small" data-act="logout">${esc(t('logout'))}</button>
         <p class="auth-note">${esc(t('logout.note'))}</p>
         <button type="button" class="auth-del" data-act="delete">${esc(t('del.link'))}</button>
@@ -324,6 +353,7 @@
   }
   async function deleteAccount() {
     if (!(await confirmDelete())) return;
+    try { await client.storage.from(AVATAR_BUCKET).remove([user.id]); } catch (e) { /* 沒有頭像就略過 */ }
     const { error } = await client.rpc('delete_my_account');
     if (error) { console.warn('[cloud] delete failed', error); alert(t('del.failed')); return; }
     store.del(PENDING_KEY);
@@ -365,6 +395,7 @@
       if (act === 'login') signIn();
       else if (act === 'logout') signOut();
       else if (act === 'delete') deleteAccount();
+      else if (act === 'settings') { const m = box.querySelector('.auth-menu'); if (m) m.hidden = true; openSettings(); }
       else if (act === 'sync') refresh();
       else if (act === 'menu') {
         const m = box.querySelector('.auth-menu');
@@ -383,6 +414,148 @@
     renderUI();
   }
 
+  /* ---------------- 個人設定（暱稱、頭像、排行榜／統計開關） ---------------- */
+  const AVATAR_BUCKET = 'avatars';
+  const AVATAR_SIZE = 256, AVATAR_MAX = 100 * 1024;
+  const avatarUrl = path => path ? `${SUPABASE_URL}/storage/v1/object/public/${AVATAR_BUCKET}/${path}` : '';
+
+  // 讀入圖片 → 置中裁成正方形 → 縮成 256×256 → WebP（不支援時用 JPEG），超過 100KB 就降低畫質
+  async function makeAvatar(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      if (!side) throw new Error('empty');
+      const c = document.createElement('canvas');
+      c.width = c.height = AVATAR_SIZE;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, AVATAR_SIZE, AVATAR_SIZE);
+      const enc = (type, q) => new Promise(res => c.toBlob(res, type, q));
+      for (const q of [0.85, 0.7, 0.55, 0.4]) {
+        let b = await enc('image/webp', q);
+        if (!b || b.type !== 'image/webp') b = await enc('image/jpeg', q);   // 舊版 Safari 不支援 WebP 輸出
+        if (b && b.size <= AVATAR_MAX) return b;
+      }
+      throw new Error('too large');
+    } finally { URL.revokeObjectURL(url); }
+  }
+
+  async function openSettings() {
+    if (!user) return;
+    const dlg = document.createElement('dialog');
+    dlg.className = 'dlg settings-dlg';
+    dlg.innerHTML = `<form method="dialog"><button class="lb-close" value="cancel" aria-label="×">×</button></form>
+      <h2>${esc(t('set.title'))}</h2><p class="dlg-msg">${esc(t('set.loading'))}</p>`;
+    document.body.appendChild(dlg);
+    dlg.addEventListener('close', () => dlg.remove());
+    dlg.showModal();
+
+    const { data: prof, error } = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    if (error || !prof) { dlg.querySelector('.dlg-msg').textContent = t('set.failed'); return; }
+    let avatarPath = prof.avatar_path, newBlob = null, removeAvatar = false;
+
+    dlg.innerHTML = `<form method="dialog"><button class="lb-close" value="cancel" aria-label="×">×</button></form>
+      <h2>${esc(t('set.title'))}</h2>
+      <div class="set-grid">
+        <div class="set-avatar">
+          <div class="set-avatar-img"></div>
+          <div class="set-avatar-tools">
+            <span class="field-label">${esc(t('set.avatar'))}</span>
+            ${prof.upload_banned ? `<p class="set-warn">${esc(t('set.avatar.banned'))}</p>` : `
+            <label class="btn ghost small file-btn">${esc(t('set.avatar.pick'))}<input type="file" accept="image/*" hidden></label>
+            <button type="button" class="btn ghost small" data-rm>${esc(t('set.avatar.remove'))}</button>`}
+            ${prof.avatar_hidden ? `<p class="set-warn">${esc(t('set.avatar.hidden'))}</p>` : ''}
+          </div>
+        </div>
+        <p class="set-note">${esc(t('set.avatar.note'))}</p>
+        <label class="set-field"><span class="field-label">${esc(t('set.nick'))}</span>
+          <input type="text" maxlength="24" value="${esc(prof.nickname || '')}" placeholder="${esc(t('set.nick.ph'))}" data-nick></label>
+        ${prof.nickname_hidden ? `<p class="set-warn">${esc(t('set.nick.hidden'))}</p>` : ''}
+        <label class="set-check"><input type="checkbox" data-join ${prof.join_completion ? 'checked' : ''}> <span>${esc(t('set.join'))}</span></label>
+        <p class="set-note" data-need hidden>${esc(t('set.join.need'))}</p>
+        <label class="set-check"><input type="checkbox" data-stats ${prof.count_in_stats ? 'checked' : ''}> <span>${esc(t('set.stats'))}</span></label>
+        <p class="dlg-msg" data-msg hidden></p>
+        <div class="del-actions">
+          <a class="btn ghost" href="ranking.html">${esc(t('set.ranking'))}</a>
+          <button type="button" class="btn" data-save>${esc(t('set.save'))}</button>
+        </div>
+      </div>`;
+    const $d = sel => dlg.querySelector(sel);
+    const msg = (text) => { const m = $d('[data-msg]'); m.hidden = !text; m.textContent = text || ''; };
+    const showAvatar = () => {
+      const box = $d('.set-avatar-img');
+      const src = newBlob ? URL.createObjectURL(newBlob) : (!removeAvatar && avatarPath ? avatarUrl(avatarPath) : '');
+      box.innerHTML = src ? `<img src="${esc(src)}" alt="">` : `<span>${esc(((($d('[data-nick]') || {}).value) || '?').trim().slice(0, 1).toUpperCase() || '?')}</span>`;
+    };
+    const syncNeed = () => { $d('[data-need]').hidden = !($d('[data-join]').checked && !$d('[data-nick]').value.trim()); };
+    showAvatar();
+    $d('[data-nick]').addEventListener('input', () => { syncNeed(); if (!newBlob && (removeAvatar || !avatarPath)) showAvatar(); });
+    $d('[data-join]').addEventListener('change', syncNeed);
+    const fileIn = $d('input[type=file]');
+    if (fileIn) fileIn.addEventListener('change', async () => {
+      const f = fileIn.files && fileIn.files[0];
+      fileIn.value = '';
+      if (!f) return;
+      try { newBlob = await makeAvatar(f); removeAvatar = false; msg(''); showAvatar(); }
+      catch (e) { msg(t('set.badimg')); }
+    });
+    const rm = $d('[data-rm]');
+    if (rm) rm.addEventListener('click', () => { newBlob = null; removeAvatar = true; showAvatar(); });
+
+    $d('[data-save]').addEventListener('click', async () => {
+      const nick = $d('[data-nick]').value.trim();
+      const join = $d('[data-join]').checked;
+      if (join && !nick) { syncNeed(); return; }
+      const btn = $d('[data-save]');
+      btn.disabled = true; msg(t('set.saving'));
+      const patch = { nickname: nick || null, join_completion: join, count_in_stats: $d('[data-stats]').checked };
+      try {
+        if (newBlob) {
+          const { error: upErr } = await client.storage.from(AVATAR_BUCKET)
+            .upload(user.id, newBlob, { upsert: true, contentType: newBlob.type, cacheControl: '3600' });
+          if (upErr) { console.warn('[cloud] avatar upload failed', upErr); msg(t('set.upfailed')); btn.disabled = false; return; }
+          patch.avatar_path = user.id + '?v=' + Date.now();
+        } else if (removeAvatar && avatarPath) {
+          await client.storage.from(AVATAR_BUCKET).remove([user.id]);
+          patch.avatar_path = null;
+        }
+        const { error: upd } = await client.from('profiles').update(patch).eq('id', user.id);
+        if (upd) throw upd;
+        avatarPath = patch.avatar_path !== undefined ? patch.avatar_path : avatarPath;
+        newBlob = null; removeAvatar = false;
+        msg(t('set.saved'));
+        profileListeners.forEach(cb => { try { cb(); } catch (e) { /* ignore */ } });
+        setTimeout(() => { if (dlg.open) dlg.close(); }, 700);
+      } catch (e) {
+        console.warn('[cloud] save profile failed', e);
+        msg(t('set.failed'));
+        btn.disabled = false;
+      }
+    });
+  }
+
+  /* ---------------- 購買人數統計（未登入也能讀） ---------------- */
+  const countsCache = {};
+  function getCounts(book) {
+    if (!client) return Promise.resolve(null);
+    if (!countsCache[book]) {
+      countsCache[book] = Promise.all([
+        client.rpc('get_item_counts', { p_book: book }),
+        client.rpc('get_project_counts', { p_book: book })
+      ]).then(([a, b]) => {
+        if (a.error || b.error) throw (a.error || b.error);
+        const items = {}, projects = {};
+        (a.data || []).forEach(r => { items[r.item_key] = Number(r.n); });
+        (b.data || []).forEach(r => { projects[r.project] = Number(r.n); });
+        return { items, projects };
+      }).catch(e => { console.warn('[cloud] counts failed', e); delete countsCache[book]; return null; });
+    }
+    return countsCache[book];
+  }
+
+  const userListeners = [], profileListeners = [];
+
   /* ---------------- 對外介面 ---------------- */
   function init(opts) {
     books = (opts && opts.books) || {};
@@ -399,6 +572,7 @@
       // 登入完成後把網址上的 ?code= 清掉
       if (session && /[?&]code=/.test(location.search)) history.replaceState(null, '', location.pathname + location.hash);
       renderUI();
+      userListeners.forEach(cb => { try { cb(user); } catch (e) { /* ignore */ } });
       // 依 Supabase 建議，不在這個 callback 裡直接呼叫其他 Supabase API
       if (user) setTimeout(startSync, 0);
     });
@@ -414,5 +588,11 @@
     schedulePush();
   }
 
-  window.AzkiCloud = { init, localChanged, refreshLang: renderUI };
+  window.AzkiCloud = {
+    init, localChanged, refreshLang: renderUI, getCounts, avatarUrl, openSettings,
+    client: () => client,
+    currentUser: () => user,
+    onUser: cb => { userListeners.push(cb); },
+    onProfileSaved: cb => { profileListeners.push(cb); }
+  };
 })();
