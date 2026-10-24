@@ -17,6 +17,9 @@ img/                 會員証底圖（card.png 含預設編號、card_blank.png
 log.html             網頁更新日記（更新紀錄＋尚未加入的周邊企劃）
 js/log.js            更新日記：讀取兩個 CSV 分頁並顯示
 js/transfer.js       紀錄轉移的編碼／解碼與 QR Code（繳稅紀錄簿用）
+js/cloud.js          Google 登入與雲端同步（Supabase）
+js/vendor/supabase.js  supabase-js 2.117.2（第三方，MIT）
+supabase/            資料庫建置 SQL（在 Supabase 後台 SQL Editor 執行）
 js/vendor/qrcode.js  QR Code 產生器（第三方，MIT）
 ```
 
@@ -106,4 +109,13 @@ python tools/download_images.py
 - 名字太長會自動縮小字體；版面座標集中在 `js/card.js`：Name 欄 `NAME_BOX`、編號位置 `NUM_X0`／`NUM_PITCH`／`NUM_Y0`，換底圖時只要改這裡。
 - 名字字體可選：黑體（Noto Sans TC/JP）、圓體（Chiron GoRound TC／M PLUS Rounded 1c）、明體（Noto Serif TC/JP）、楷體手寫（LXGW WenKai TC／Klee One）、粗圓流行（Dela Gothic One）、英文手寫（Pacifico）。編號不使用字體，而是依原圖數字的形狀用線條畫出 0–9（`js/card.js` 的 `GLYPHS`）。全部來自 Google Fonts，在 `card.html` 各自用獨立的 `<link>` 載入（其中一個失敗不會影響其他字體）；字體清單在 `js/card.js` 的 `FONTS`。
 - 底圖若要換成更大的原圖，直接覆蓋 `img/card.png`；`img/card_blank.png` 需同尺寸、且把右下角編號去掉。
+
+## 會員登入與雲端同步（Supabase，第 1 階段）
+
+- 只支援 Google 登入。未登入時一切照舊，紀錄只存在瀏覽器。
+- 設定集中在 `js/cloud.js` 最上面：`SUPABASE_URL`、`SUPABASE_KEY`（publishable key，本來就可以公開）。**不要**把 `service_role`／secret key 或 Google 用戶端密鑰放進 repo。
+- 資料庫：在 Supabase 後台 **SQL Editor** 執行 `supabase/001_init.sql`（可重複執行）。建立 `records`（紀錄）、`profiles`（個人資料，先預留給排行榜）與權限規則（每個人只能讀寫自己的紀錄）。
+- 同步規則：本機修改先記成「待同步」約 1 秒後送出；雲端為正本。這台裝置第一次和帳號連結時，兩邊都有不同紀錄會讓使用者選「合併（同一件取較大數量）」或「以雲端為準」。登出保留本機紀錄，下次登入重新比較。
+- 第 1 階段只同步繳稅紀錄簿；Voice 收集簿在第 2 階段加入。
+- 詳細規劃見 Project 文件「會員系統規劃（Supabase）」。
 

@@ -19,7 +19,7 @@
       brand: '開拓者の愉悅部',
       'nav.ledger': '繳稅紀錄簿', 'nav.voice': 'Voice 收集簿', 'nav.card': '會員証', 'nav.log': '更新日記',
       title: '開拓者繳稅紀錄簿',
-      lead: '把每一筆為 AZKi 繳的稅記下來。點「繳稅」標記已入手的周邊，紀錄只存在你這台裝置的瀏覽器裡。',
+      lead: '將每一筆贊助 AZKi Sololive 的繳稅記錄下來。',
       'stat.count': '已繳稅', 'stat.unit': '件', 'stat.yen': '繳稅總額', 'stat.bar': '收集進度',
       'search.ph': '搜尋企劃或周邊名稱…',
       'filter.toggle': '篩選', 'filter.project': '企劃', 'filter.goods': '種類', 'filter.year': '年份',
@@ -76,7 +76,7 @@
       brand: '開拓者の愉悅部',
       'nav.ledger': '納税記録簿', 'nav.voice': 'ボイスコレクション', 'nav.card': '会員証', 'nav.log': '更新日記',
       title: '開拓者納税記録簿',
-      lead: 'AZKi のために納めた税をひとつずつ記録しよう。「納税」を押して入手済みのグッズをチェック。記録はこの端末のブラウザ内にだけ保存されます。',
+      lead: 'AZKi の Sololive を応援するために納めた税を、ひとつずつ記録しよう。',
       'stat.count': '納税済み', 'stat.unit': '点', 'stat.yen': '納税総額', 'stat.bar': '収集の進み具合',
       'search.ph': '企画名・グッズ名で検索…',
       'filter.toggle': '絞り込み', 'filter.project': '企画', 'filter.goods': '種類', 'filter.year': '年',
@@ -247,6 +247,7 @@
   }
   function saveOwned() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.owned)); } catch (e) { /* ignore */ }
+    if (window.AzkiCloud) window.AzkiCloud.localChanged('ledger', state.owned);   // 登入時同步到雲端
   }
 
   /* ---------------- helpers ---------------- */
@@ -741,6 +742,8 @@
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* ignore */ }
     applyStaticI18n();
     if (state.projects.length) { buildFilterOptions(); render(); }
+
+    if (window.AzkiCloud) window.AzkiCloud.refreshLang();
   }
 
   function isDark() {
@@ -786,6 +789,21 @@
     bindEvents();
     load();
     handleHash();
+    // 雲端同步：雲端有更新時直接套用到畫面（不經過 saveOwned，避免又被當成本機修改送回去）
+    if (window.AzkiCloud) {
+      window.AzkiCloud.init({
+        books: {
+          ledger: {
+            get: () => Object.assign({}, state.owned),
+            apply: owned => {
+              state.owned = normalizeOwned(owned);
+              try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.owned)); } catch (e) { /* ignore */ }
+              if (state.projects.length) render(); else renderSummary();
+            }
+          }
+        }
+      });
+    }
   }
   if (typeof module !== 'undefined') module.exports = { parseCSV, buildProjects };
 })();

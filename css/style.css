@@ -496,3 +496,33 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
 .doc li { margin: 4px 0; }
 .doc a { color: var(--accent-text); }
 .site-footer .footer-links a { color: inherit; }
+
+/* ---------- 登入／同步（js/cloud.js） ---------- */
+.auth { position: relative; }
+.login-btn { display: inline-flex; align-items: center; gap: 6px; }
+.login-btn svg { width: 16px; height: 16px; flex: none; }
+.avatar-btn {
+  position: relative; width: 36px; height: 36px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 2px solid var(--pink-soft); background: var(--surface); overflow: visible; display: grid; place-items: center;
+  color: var(--accent-text); font-weight: 800;
+}
+.avatar-btn img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.avatar-btn .sync-dot { position: absolute; right: -2px; bottom: -2px; border: 2px solid var(--bg); }
+.sync-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #3ba55c; flex: none; }
+.sync-dot.busy { background: #f0a020; }
+.sync-dot.warn { background: #e0464e; }
+.auth-menu {
+  position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 240px; padding: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+  display: grid; gap: 8px;
+}
+.auth-menu[hidden] { display: none; }
+.auth-menu p { margin: 0; }
+.auth-name { font-weight: 700; overflow-wrap: anywhere; }
+.auth-mail { font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.auth-status { display: flex; align-items: center; gap: 6px; font-size: .85rem; color: var(--ink-soft); }
+.auth-note { font-size: .75rem; color: var(--ink-soft); }
+@media (max-width: 640px) {
+  .login-btn span { display: none; }
+  .login-btn { padding: 6px 10px; }
+}
