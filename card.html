@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20261024b">
 </head>
 <body>
   <header class="site-header">
@@ -51,11 +51,6 @@
   </header>
 
   <main class="cardpage">
-    <section class="card-preview" aria-live="polite">
-      <canvas id="card-canvas" role="img" data-i18n-aria="card.alt"></canvas>
-      <p class="state" id="card-state" data-i18n="loading">圖片讀取中…</p>
-    </section>
-
     <section class="card-form">
       <label class="field">
         <span class="field-label" data-i18n="name.label">名字</span>
@@ -72,6 +67,7 @@
         </div>
       </div>
 
+      <div class="field-pair">
       <label class="field">
         <span class="field-label" data-i18n="font.label">名字字體</span>
         <select id="in-font">
@@ -93,6 +89,7 @@
           <option value="none" data-i18n="num.none">不顯示編號</option>
         </select>
       </label>
+      </div>
 
       <label class="field" id="row-custom" hidden>
         <span class="field-label" data-i18n="num.custom.label">編號（最多 8 位數字，不足補 0）</span>
@@ -104,6 +101,11 @@
         <span class="rand-val" id="rand-val"></span>
       </div>
 
+    </section>
+
+    <section class="card-preview" aria-live="polite">
+      <canvas id="card-canvas" role="img" data-i18n-aria="card.alt"></canvas>
+      <p class="state" id="card-state" data-i18n="loading">圖片讀取中…</p>
       <button type="button" class="btn dl-btn" id="btn-download" disabled data-i18n="btn.download">下載圖片（PNG）</button>
       <p class="card-note" data-i18n="note"></p>
     </section>
@@ -115,7 +117,7 @@
     <p class="updated"><span data-i18n="updated">最後更新</span>：<time datetime="2026-10-24">2026/10/24</time></p>
   </footer>
 
-  <script src="js/card.js"></script>
+  <script src="js/card.js?v=20261024b"></script>
   <script src="js/totop.js"></script>
 </body>
 </html>
