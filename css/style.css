@@ -488,3 +488,11 @@ dialog.dlg p { margin: 8px 0; font-size: .9rem; line-height: 1.6; }
 .pos-row input[type="range"] { flex: 1; min-width: 0; accent-color: var(--pink); }
 .pos-end { font-size: .8rem; color: var(--ink-soft); white-space: nowrap; }
 .card-note { margin: 0; font-size: .85rem; color: var(--ink-soft); }
+
+/* ---------- privacy page (privacy.html) ---------- */
+.doc { max-width: 780px; margin: 0 auto; padding: 8px 16px 48px; line-height: 1.8; }
+.doc h2 { font-family: var(--font-round); font-size: 1.1rem; color: var(--accent-text); margin: 28px 0 8px; }
+.doc ul { padding-left: 1.4em; margin: 8px 0; }
+.doc li { margin: 4px 0; }
+.doc a { color: var(--accent-text); }
+.site-footer .footer-links a { color: inherit; }
